@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Vendimia</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- CABECERA -->
+    <header class="topbar">
+        <div class="logo">
+            <h1>Gestión de Vendimia</h1>
+        </div>
+
+        <nav class="nav-buttons">
+            <button class="nav-btn active" data-page="viticultores">
+                Viticultores
+            </button>
+
+            <button class="nav-btn" data-page="entradas">
+                Entradas de Uva
+            </button>
+
+            <button class="nav-btn" data-page="depositos">
+                Depósitos Encubado
+            </button>
+        </nav>
+
+        <div class="action-buttons">
+            <button id="saveBtn" class="primary">
+                Guardar
+            </button>
+
+            <button id="pdfBtn" class="secondary">
+                Exportar PDF
+            </button>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- ===================================================== -->
+        <!-- PAGINA VITICULTORES -->
+        <!-- ===================================================== -->
+
+        <section id="page-viticultores" class="page active">
+
+            <div class="section-header">
+                <h2>Viticultores</h2>
+            </div>
+
+            <!-- FORMULARIO NUEVO VITICULTOR -->
+            <div class="form-card">
+
+                <h3>NUEVO VITICULTOR</h3>
+
+                <div class="form-grid">
+
+                    <div>
+                        <label>Viticultor</label>
+                        <input type="text" id="vitNombre">
+                    </div>
+
+                    <div>
+                        <label>Detalles / Observaciones / Teléfono</label>
+                        <input type="text" id="vitDetalle">
+                    </div>
+
+                </div>
+
+                <button id="addViticultor" class="primary">
+                    Añadir Viticultor
+                </button>
+
+            </div>
+
+            <!-- TABLA PRINCIPAL -->
+            <table id="viticultoresTable">
+
+                <thead>
+                    <tr>
+                        <th>Viticultor</th>
+                        <th>Detalles / Obserbaciones / Teléfono</th>
+                        <th>Total Hectáreas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                </tbody>
+
+            </table>
+
+        </section>
+
+        <!-- ===================================================== -->
+        <!-- PAGINA ENTRADAS -->
+        <!-- ===================================================== -->
+
+        <section id="page-entradas" class="page">
+
+            <div class="section-header">
+                <h2>Entradas de Uva</h2>
+            </div>
+
+            <table id="entradasTable">
+
+                <thead>
+                    <tr>
+
+                        <th>Fecha</th>
+                        <th>Hora</th>
+
+                        <th>Titular</th>
+                        <th>Viña</th>
+                        <th>DNI</th>
+
+                        <th>Municipio</th>
+                        <th>Polígono</th>
+                        <th>Parcela</th>
+                        <th>Recinto</th>
+
+                        <th>Variedad <br> Uva</th>
+
+                        <th>Vendimia</th>
+
+                        <th>Kg Bruto</th>
+                        <th>Kg Tara</th>
+                        <th>Kg Neto</th>
+
+                        <th>Grado <br> Alcohólico (%)</th>
+
+                        <th>Depósito</th>
+                        <th>Vuelta <br>Depósito</th>
+
+                        <th>Acciones</th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+                </tbody>
+
+            </table>
+
+            <button id="addEntrada" class="primary">
+                Añadir Entrada
+            </button>
+
+        </section>
+
+        <!-- ===================================================== -->
+        <!-- PAGINA DEPOSITOS -->
+        <!-- ===================================================== -->
+
+        <section id="page-depositos" class="page">
+
+            <div class="section-header">
+                <h2>Depósitos Encubado</h2>
+            </div>
+
+            <table id="depositosTable">
+
+                <thead>
+                    <tr>
+
+                        <th>Depósito</th>
+
+                        <th>Vuelta <br>Depósito</th>
+
+                        <th>Kg Uva</th>
+
+                        <th>Litros Yema <br>Previsto</th>
+
+                        <th>Litros Prensa <br>Previsto</th>
+
+                        <th>Litros Yema Real</th>
+
+                        <th>Litros Prensa Real</th>
+
+                        <th>Litros pH</th>
+
+                        <th>Total Litros</th>
+
+                        <th>%</th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+
+</body>
+</html>

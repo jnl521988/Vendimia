@@ -1,0 +1,542 @@
+/* ==========================
+   RESET GENERAL
+========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background:#f4f6f9;
+    color:#333;
+}
+
+/* ==========================
+   CABECERA
+========================== */
+
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:1000;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:15px 25px;
+
+    background:#1f2937;
+    color:white;
+
+    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
+
+.logo h1{
+    font-size:22px;
+}
+
+/* ==========================
+   BOTONES NAVEGACIÓN
+========================== */
+
+.nav-buttons{
+    display:flex;
+    gap:10px;
+}
+
+.nav-btn{
+    border:none;
+    padding:10px 16px;
+    border-radius:6px;
+
+    background:#374151;
+    color:white;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.nav-btn:hover{
+    background:#4b5563;
+}
+
+.nav-btn.active{
+    background:#2563eb;
+}
+
+/* ==========================
+   BOTONES GENERALES
+========================== */
+
+button{
+    cursor:pointer;
+    transition:.2s;
+}
+
+.primary{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:10px 16px;
+    border-radius:6px;
+}
+
+.primary:hover{
+    background:#15803d;
+}
+
+.secondary{
+    background:#eab308;
+    color:black;
+    border:none;
+    padding:10px 16px;
+    border-radius:6px;
+}
+
+.secondary:hover{
+    background:#ca8a04;
+}
+
+.danger{
+    background:#dc2626;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:6px;
+}
+
+.danger:hover{
+    background:#b91c1c;
+}
+
+.edit{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:6px;
+}
+
+.edit:hover{
+    background:#1d4ed8;
+}
+
+/* ==========================
+   CONTENIDO
+========================== */
+
+main{
+    padding:25px;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+/* ==========================
+   TÍTULOS
+========================== */
+
+.section-header{
+    margin-bottom:20px;
+}
+
+.section-header h2{
+    font-size:28px;
+    color:#111827;
+}
+
+/* ==========================
+   TARJETAS FORMULARIO
+========================== */
+
+.form-card{
+    background:rgb(190, 186, 186);
+    padding:20px;
+    margin-bottom:25px;
+
+    border-radius:10px;
+
+    box-shadow:0 2px 6px rgba(0,0,0,.08);
+}
+
+.form-card h3{
+    margin-bottom:15px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:15px;
+
+    margin-bottom:15px;
+}
+
+/* ==========================
+   INPUTS
+========================== */
+
+input,
+select{
+    width:100%;
+
+    padding:8px;
+
+    border:1px solid #d1d5db;
+    border-radius:6px;
+
+    background:white;
+}
+
+input:focus,
+select:focus{
+    outline:none;
+    border-color:#2563eb;
+}
+
+/* ==========================
+   TABLAS
+========================== */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+
+    background:white;
+
+    margin-bottom:15px;
+
+    box-shadow:0 2px 6px rgba(0,0,0,.05);
+}
+
+table th{
+    background:#d28c87;
+    color:#111827;
+
+    padding:10px;
+    border:1px solid #b8bdc4;
+}
+
+table td{
+    padding:8px;
+    border:1px solid #d1d5db;
+}
+
+/* ==========================
+   TABLAS ANIDADAS
+========================== */
+
+.subtable{
+    margin-top:10px;
+    margin-bottom:10px;
+}
+
+.subtable th{
+    background:#dbeafe;
+}
+
+.subtable td{
+    background:#f9fafb;
+}
+
+/* ==========================
+   HISTORIAL CAMPAÑAS
+========================== */
+
+.historial-box{
+    background:#f3f4f6;
+    padding:15px;
+    border-radius:8px;
+}
+
+.historial-box h4{
+    margin-bottom:10px;
+}
+
+/* ==========================
+   TITULARES
+========================== */
+
+.titular-box{
+    margin-top:15px;
+
+    border:1px solid #d1d5db;
+
+    border-radius:8px;
+
+    padding:10px;
+
+    background:#f9fafb;
+}
+
+/* ==========================
+   VIÑAS
+========================== */
+
+.vina-box{
+    margin-top:10px;
+    padding:10px;
+
+    border-left:4px solid #16a34a;
+
+    background:white;
+}
+
+/* ==========================
+   ACCIONES
+========================== */
+
+.actions{
+    display:flex;
+    justify-content:center;
+    gap:5px;
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+@media(max-width:1200px){
+
+    .topbar{
+        flex-direction:column;
+        gap:15px;
+    }
+
+    .nav-buttons{
+        flex-wrap:wrap;
+        justify-content:center;
+    }
+
+}
+
+@media(max-width:768px){
+
+    main{
+        padding:10px;
+    }
+
+    table{
+        font-size:12px;
+    }
+
+    .section-header h2{
+        font-size:22px;
+    }
+
+}
+
+/* =======================================
+   NIVELES DE VISUALIZACIÓN
+======================================= */
+
+.viticultor-row{
+    background:#1e3a8a;
+    color:white;
+    font-weight:bold;
+}
+
+.viticultor-row td{
+    border:1px solid #1e40af;
+}
+
+.titular-row{
+    background:#dbeafe;
+    font-weight:bold;
+}
+
+.titular-row td{
+    border:1px solid #93c5fd;
+}
+
+.vina-row{
+    background:white;
+}
+
+.vina-row:hover{
+    background:#f8fafc;
+}
+
+.historial-box{
+    background:#eff6ff;
+    border:3px solid #eb3225;
+    border-radius:10px;
+    padding:15px;
+}
+
+.subtable{
+    margin-top:10px;
+}
+
+.subtable th{
+    background:#c7d2fe;
+}
+
+.subtable td{
+    vertical-align:middle;
+}
+
+/* ==========================================
+   TABLA ENTRADAS DE UVA
+========================================== */
+
+#entradasTable{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:auto;
+    white-space:nowrap;
+}
+
+#entradasTable th{
+    background:#1e3a8a;
+    color:white;
+    font-size:13px;
+    padding:8px;
+}
+
+#entradasTable td{
+    padding:4px;
+    vertical-align:middle;
+}
+
+#entradasTable input,
+#entradasTable select{
+    width:100%;
+    min-width:60px;
+    box-sizing:border-box;
+    padding:5px;
+    font-size:13px;
+}
+
+/* Fecha */
+#entradasTable th:nth-child(1),
+#entradasTable td:nth-child(1){
+    min-width:120px;
+}
+
+/* Hora */
+#entradasTable th:nth-child(2),
+#entradasTable td:nth-child(2){
+    min-width:90px;
+}
+
+/* Titular */
+#entradasTable th:nth-child(3),
+#entradasTable td:nth-child(3){
+    min-width:300px;
+}
+
+/* Viña */
+#entradasTable th:nth-child(4),
+#entradasTable td:nth-child(4){
+    min-width:180px;
+}
+
+/* DNI */
+#entradasTable th:nth-child(5),
+#entradasTable td:nth-child(5){
+    min-width:140px;
+}
+
+/* Municipio */
+#entradasTable th:nth-child(6),
+#entradasTable td:nth-child(6){
+    min-width:140px;
+}
+
+/* Polígono */
+#entradasTable th:nth-child(7),
+#entradasTable td:nth-child(7){
+    min-width:90px;
+}
+
+/* Parcela */
+#entradasTable th:nth-child(8),
+#entradasTable td:nth-child(8){
+    min-width:90px;
+}
+
+/* Recinto */
+#entradasTable th:nth-child(9),
+#entradasTable td:nth-child(9){
+    min-width:90px;
+}
+
+/* Variedad */
+#entradasTable th:nth-child(10),
+#entradasTable td:nth-child(10){
+    min-width:160px;
+}
+
+/* Vendimia */
+#entradasTable th:nth-child(11),
+#entradasTable td:nth-child(11){
+    min-width:100px;
+}
+
+/* Kg Bruto */
+#entradasTable th:nth-child(12),
+#entradasTable td:nth-child(12){
+    min-width:120px;
+}
+
+/* Kg Tara */
+#entradasTable th:nth-child(13),
+#entradasTable td:nth-child(13){
+    min-width:120px;
+}
+
+/* Kg Neto */
+#entradasTable th:nth-child(14),
+#entradasTable td:nth-child(14){
+    min-width:120px;
+}
+
+/* Grado */
+#entradasTable th:nth-child(15),
+#entradasTable td:nth-child(15){
+    min-width:90px;
+}
+
+/* Depósito */
+#entradasTable th:nth-child(16),
+#entradasTable td:nth-child(16){
+    min-width:90px;
+}
+
+/* Vuelta */
+#entradasTable th:nth-child(17),
+#entradasTable td:nth-child(17){
+    min-width:90px;
+}
+
+/* Acciones */
+#entradasTable th:nth-child(18),
+#entradasTable td:nth-child(18){
+    min-width:110px;
+}
+
+/* Rayado de filas */
+
+#entradasTable tbody tr:nth-child(even){
+    background:#f8fafc;
+}
+
+#entradasTable tbody tr:hover{
+    background:#dbeafe;
+}
+
+/* Scroll horizontal */
+
+#page-entradas{
+    overflow-x:auto;
+}
