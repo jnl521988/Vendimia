@@ -173,7 +173,10 @@ function renderViticultores() {
 
         histRow.id = `historial-${index}`;
 
-        histRow.style.display = "none";
+        histRow.style.display =
+vit.abierto
+? "table-row"
+: "none";
 
         histRow.innerHTML = `
             <td colspan="4">
@@ -184,70 +187,90 @@ function renderViticultores() {
                         Historial de Campañas
                     </h4>
 
+<button
+class="primary"
+onclick="agregarAnio(${index})">
+
++ Añadir Campaña
+
+</button>
+
                     <table class="subtable">
 
-                        <tr>
+<thead>
 
-                            ${
-                                vit.historial.map(h =>
-                                `<th>${h.anio}</th>`
-                                ).join("")
-                            }
+<tr>
+    <th>Año Campaña</th>
+    <th>Kgs Uva</th>
+    <th>Acciones</th>
+</tr>
 
-                            <th>
-                                <button
-                                onclick="agregarAnio(${index})">
-                                + Año
-                                </button>
-                            </th>
+</thead>
 
-                        </tr>
+<tbody>
 
-                        <tr>
+${
+vit.historial.map((h,i)=>`
 
-                           ${vit.historial.map((h, i) => `
+<tr>
+
 <td>
 
-    <div>${h.anio}</div>
+<input
+type="number"
+value="${h.anio}"
 
-    <input
-    type="number"
-    value="${h.kg}"
-    onchange="
-    actualizarKg(
-    ${index},
-    ${i},
-    this.value
-    )">
-
-    <br>
-
-    <button
-    class="edit"
-    onclick="
-    editarAnio(
-    ${index},
-    ${i}
-    )">
-    Editar
-    </button>
-
-    <button
-    class="danger"
-    onclick="
-    eliminarAnio(
-    ${index},
-    ${i}
-    )">
-    X
-    </button>
+onchange="
+actualizarAnio(
+${index},
+${i},
+this.value
+)
+">
 
 </td>
-`).join("")}
 
-                        </tr>
+<td>
 
-                    </table>
+<input
+type="number"
+value="${h.kg}"
+
+onchange="
+actualizarKg(
+${index},
+${i},
+this.value
+)
+">
+
+</td>
+
+<td>
+
+<button
+class="danger"
+onclick="
+eliminarAnio(
+${index},
+${i}
+)
+">
+
+Eliminar
+
+</button>
+
+</td>
+
+</tr>
+
+`).join("")
+}
+
+</tbody>
+
+</table>
 
                     <hr style="margin:15px 0">
 
@@ -256,7 +279,7 @@ function renderViticultores() {
 <button
 class="primary"
 onclick="agregarTitular(${index})">
-+ Titular
++ Añadir Titular
 </button>
 
 <table class="subtable">
@@ -282,28 +305,45 @@ onclick="agregarTitular(${index})">
 
                 <td class="actions">
 
-                    <button
-                    class="edit"
-                    onclick="
-                    editarTitular(
-                    ${index},
-                    ${titIndex}
-                    )">
-                    Editar
-                    </button>
+    <button
+    class="edit"
+    onclick="
+    editarTitular(
+    ${index},
+    ${titIndex}
+    )">
+    Editar
+    </button>
 
-                    <button
-                    class="danger"
-                    onclick="
-                    eliminarTitular(
-                    ${index},
-                    ${titIndex}
-                    )">
-                    Eliminar
-                    </button>
+    <button
+    onclick="
+    toggleVinas(
+    ${index},
+    ${titIndex}
+    )">
+    ${
+    tit.mostrarVinas
+    ? "Ocultar Viñas"
+    : "Mostrar Viñas"
+    }
+    </button>
 
-                </td>
+    <button
+    class="danger"
+    onclick="
+    eliminarTitular(
+    ${index},
+    ${titIndex}
+    )">
+    Eliminar
+    </button>
 
+</td>
+
+${
+tit.mostrarVinas
+?
+`
             </tr>
 
             <tr>
@@ -316,7 +356,7 @@ onclick="agregarTitular(${index})">
         ${index},
         ${titIndex}
         )">
-        + Viña
+        + Añadir Viña
         </button>
 
         <table class="subtable">
@@ -396,9 +436,13 @@ onclick="agregarTitular(${index})">
 
         </table>
 
-    </td>
+</td>
 </tr>
 
+`
+:
+''
+}
             `).join('')
         }
 
@@ -423,17 +467,24 @@ onclick="agregarTitular(${index})">
 
 window.toggleHistorial = function(index){
 
-    const fila =
-    document.getElementById(
-        `historial-${index}`
-    );
+    viticultores[index].abierto =
+    !viticultores[index].abierto;
 
-    if(!fila) return;
+    renderViticultores();
 
-    fila.style.display =
-    fila.style.display === "none"
-        ? "table-row"
-        : "none";
+};
+
+window.toggleVinas =
+function(vitIndex,titIndex){
+
+    const titular =
+    viticultores[vitIndex]
+    .titulares[titIndex];
+
+    titular.mostrarVinas =
+    !titular.mostrarVinas;
+
+    renderViticultores();
 
 };
 
@@ -443,89 +494,49 @@ window.toggleHistorial = function(index){
 
 window.agregarAnio = function(index){
 
-    const anio =
-    prompt("Introduzca el año");
+   const anio =
+prompt("Año");
 
-    if(!anio) return;
+if(!anio) return;
 
-    const kg =
-    prompt("Kg de uva de esa campaña") || 0;
+const kg =
+prompt("Kg de uva","0");
 
-    viticultores[index]
-    .historial
-    .push({
+viticultores[index]
+.historial
+.push({
 
-        anio,
-        kg: Number(kg)
+    anio,
 
-    });
+    kg:Number(kg)||0
 
-    renderViticultores();
+});
 
-    setTimeout(()=>{
+renderViticultores();
 
-        const fila =
-        document.getElementById(
-            `historial-${index}`
-        );
+setTimeout(()=>{
 
-        if(fila){
+    const fila =
+    document.getElementById(
+    `historial-${index}`
+    );
 
-            fila.style.display =
-            "table-row";
+    if(fila)
+        fila.style.display =
+        "table-row";
 
-        }
-
-    },10);
-
-};
+},10);}
 
 // =======================================
 // ACTUALIZAR KG
 // =======================================
 
-window.actualizarKg =
-function(vitIndex, anioIndex, valor){
+window.actualizarAnio =
+function(vitIndex,anioIndex,valor){
 
     viticultores[vitIndex]
     .historial[anioIndex]
-    .kg = Number(valor);
-
-};
-
-window.editarAnio =
-function(vitIndex,anioIndex){
-
-    const actual =
-    viticultores[vitIndex]
-    .historial[anioIndex];
-
-    const nuevoAnio =
-    prompt(
-        "Nuevo año",
-        actual.anio
-    );
-
-    if(nuevoAnio === null)
-        return;
-
-    actual.anio =
-    nuevoAnio;
-
-    renderViticultores();
-
-    setTimeout(()=>{
-
-        const fila =
-        document.getElementById(
-        `historial-${vitIndex}`
-        );
-
-        if(fila)
-            fila.style.display =
-            "table-row";
-
-    },10);
+    .anio = valor;
 
 };
 
@@ -534,7 +545,7 @@ function(vitIndex,anioIndex){
 
     if(
         !confirm(
-        "¿Eliminar esta campaña?"
+        "Eliminar campaña?"
         )
     ) return;
 
@@ -546,19 +557,6 @@ function(vitIndex,anioIndex){
     );
 
     renderViticultores();
-
-    setTimeout(()=>{
-
-        const fila =
-        document.getElementById(
-        `historial-${vitIndex}`
-        );
-
-        if(fila)
-            fila.style.display =
-            "table-row";
-
-    },10);
 
 };
 
@@ -638,7 +636,8 @@ function(vitIndex){
         nombre,
         dni,
 
-        vinas: []
+        vinas:[],
+mostrarVinas:false
 
     });
 
@@ -994,7 +993,7 @@ function generarSelectVinas(
     titular.vinas.forEach(v=>{
 
         const texto =
-        `${v.municipio} | Parcela ${v.parcela}`;
+`${v.municipio} | Pol.${v.poligono} | Parc.${v.parcela} | Rec.${v.recinto}`;
 
         html += `
 
@@ -1026,6 +1025,15 @@ function renderEntradas(){
         document.createElement("tr");
 
         tr.innerHTML = `
+
+        <td>
+
+<input
+type="checkbox"
+class="entrada-check"
+data-index="${index}">
+
+       </td>
 
         <td>
 
@@ -1438,6 +1446,10 @@ function renderDepositos(){
         Number(datos.yemaReal) +
         Number(datos.prensaReal);
 
+      const totalLitrosPH =
+totalLitros +
+Number(datos.ph || 0);
+
         const porcentaje =
         grupo.kg > 0
         ?
@@ -1519,6 +1531,10 @@ function renderDepositos(){
 
         ${porcentaje.toFixed(2)} %
 
+        <td>
+        ${totalLitrosPH.toFixed(0)}
+        </td>
+
         </td>
 
         `;
@@ -1585,4 +1601,112 @@ function guardarDepositos(){
 renderViticultores();
 renderEntradas();
 renderDepositos();
+
+document
+.getElementById("checkAllEntradas")
+.addEventListener("change",function(){
+
+    document
+    .querySelectorAll(".entrada-check")
+    .forEach(check=>{
+
+        check.checked =
+        this.checked;
+
+    });
+
+});
+
+document
+.getElementById("deleteSelectedBtn")
+.addEventListener("click",()=>{
+
+    const seleccionados =
+    [...document.querySelectorAll(
+        ".entrada-check:checked"
+    )]
+    .map(c=>Number(c.dataset.index))
+    .sort((a,b)=>b-a);
+
+    if(
+        seleccionados.length===0
+    ){
+        alert("No hay filas seleccionadas");
+        return;
+    }
+
+    if(
+        !confirm(
+            "Eliminar filas seleccionadas?"
+        )
+    ) return;
+
+    seleccionados.forEach(i=>{
+
+        entradas.splice(i,1);
+
+    });
+
+    renderEntradas();
+    renderDepositos();
+    guardarDatos();
+
+});
+
+document
+.getElementById("resetSelectedBtn")
+.addEventListener("click",()=>{
+
+    const seleccionados =
+    [...document.querySelectorAll(
+        ".entrada-check:checked"
+    )]
+    .map(c=>Number(c.dataset.index));
+
+    if(
+        seleccionados.length===0
+    ){
+        alert("No hay filas seleccionadas");
+        return;
+    }
+
+    seleccionados.forEach(i=>{
+
+        entradas[i] = {
+
+            fecha:"",
+            hora:"",
+
+            titular:"",
+            vina:"",
+            dni:"",
+
+            municipio:"",
+            poligono:"",
+            parcela:"",
+            recinto:"",
+
+            variedad:"",
+            vendimia:"",
+
+            kgBruto:0,
+            kgTara:0,
+            kgNeto:0,
+
+            grado:0,
+
+            deposito:"",
+            vuelta:""
+
+        };
+
+    });
+
+    renderEntradas();
+    renderDepositos();
+    guardarDatos();
+
+});
+
+
 

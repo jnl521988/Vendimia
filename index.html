@@ -11,7 +11,7 @@
     <!-- CABECERA -->
     <header class="topbar">
         <div class="logo">
-            <h1>Gestión de Vendimia</h1>
+            <h1>GESTIÓN DE VENDIMIA</h1>
         </div>
 
         <nav class="nav-buttons">
@@ -107,8 +107,26 @@
 
             <table id="entradasTable">
 
+                <div class="toolbar-entradas">
+
+                <button id="deleteSelectedBtn" class="danger">
+             Eliminar Selección
+                </button>
+
+                <button id="resetSelectedBtn" class="secondary">
+             Reset Selección
+                </button>
+
+</div>
+
                 <thead>
                     <tr>
+
+                        <th>
+                        <input
+                        type="checkbox"
+                        id="checkAllEntradas">
+                       </th>
 
                         <th>Fecha</th>
                         <th>Hora</th>
@@ -182,9 +200,11 @@
 
                         <th>Litros pH</th>
 
-                        <th>Total Litros</th>
+                        <th>Litros Uva</th>
 
-                        <th>%</th>
+                        <th>% Rto. Uva</th>
+
+                        <th>Total Litros + pH</th>
 
                     </tr>
                 </thead>
