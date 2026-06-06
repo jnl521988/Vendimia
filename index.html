@@ -16,15 +16,18 @@
 
         <nav class="nav-buttons">
             <button class="nav-btn active" data-page="viticultores">
-                Viticultores
+                VITICULTORES
             </button>
 
             <button class="nav-btn" data-page="entradas">
-                Entradas de Uva
+                ENTRADA DE UVA
             </button>
 
             <button class="nav-btn" data-page="depositos">
-                Depósitos Encubado
+                DEPÓSITOS ENCUBADOS
+            </button>
+            <button class="nav-btn" data-page= "totales">
+                TOTALES
             </button>
         </nav>
 
@@ -64,7 +67,7 @@
                     </div>
 
                     <div>
-                        <label>Detalles / Observaciones / Teléfono</label>
+                        <label>Observaciones / Teléfono</label>
                         <input type="text" id="vitDetalle">
                     </div>
 
@@ -82,7 +85,7 @@
                 <thead>
                     <tr>
                         <th>Viticultor</th>
-                        <th>Detalles / Obserbaciones / Teléfono</th>
+                        <th>Observaciones / Teléfono</th>
                         <th>Total Hectáreas</th>
                         <th>Acciones</th>
                     </tr>
@@ -181,8 +184,21 @@
 
             <table id="depositosTable">
 
+                <div class="depositos-toolbar">
+    <button id="btnDescubado" class="primary">
+        Descubado
+    </button>
+
+    <button id="btnQuitarDescubado" class="secondary">
+        Quitar Descubado
+    </button>
+                </div>
+
                 <thead>
                     <tr>
+                        <th>
+                        <input type="checkbox" id="checkAllDepositos">
+                        </th>
 
                         <th>Depósito</th>
 
@@ -215,6 +231,166 @@
             </table>
 
         </section>
+
+<!-- ===================================== -->
+<!-- TOTALES -->
+<!-- ===================================== -->
+
+<section id="page-totales" class="page">
+
+    <div class="section-header">
+        <h2>Totales de Campaña</h2>
+    </div>
+
+    <!-- TABLA UVA -->
+
+    <div class="form-card">
+
+        <h3>RESUMEN DE UVAS</h3>
+
+        <table id="tablaTotalesUva">
+
+            <thead>
+                <tr>
+                    <th>Variedades de Uvas</th>
+                    <th>Kgs Uvas</th>
+                    <th>% Uvas</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- TABLA LITROS -->
+
+    <div class="form-card">
+
+        <h3>RESUMEN DE LITROS</h3>
+
+        <table id="tablaTotalesLitros">
+
+            <thead>
+                <tr>
+                    <th>Características de Litros</th>
+                    <th>Litros</th>
+                    <th>% Litros</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            </tbody>
+
+        </table>
+
+    </div>
+
+<!-- ===================================== -->
+<!-- TABLA LÍAS -->
+<!-- ===================================== -->
+
+<div class="totales-card">
+
+    <h3>LÍAS</h3>
+
+    <button
+    class="primary"
+    id="addLia">
+    + Añadir Lías
+    </button>
+
+    <table id="liasTable">
+
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Depósito</th>
+                <th>Litros</th>
+                <th>%</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+
+        <tfoot>
+            <tr>
+                <th colspan="2">
+                    TOTAL
+                </th>
+
+                <th id="totalLias">
+                    0
+                </th>
+
+                <th id="porcentajeLias">
+                    0 %
+                </th>
+
+                <th></th>
+            </tr>
+        </tfoot>
+
+    </table>
+
+</div>
+
+<!-- ===================================== -->
+<!-- TABLA HOLLEJOS -->
+<!-- ===================================== -->
+
+<div class="totales-card">
+
+    <h3>HOLLEJOS PRENSADOS</h3>
+
+    <button
+    class="primary"
+    id="addHollejo">
+    + Añadir Hollejos
+    </button>
+
+    <table id="hollejosTable">
+
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Depósito</th>
+                <th>Kg</th>
+                <th>%</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+
+        <tfoot>
+            <tr>
+
+                <th colspan="2">
+                    TOTAL
+                </th>
+
+                <th id="totalHollejos">
+                    0
+                </th>
+
+                <th id="porcentajeHollejos">
+                    0 %
+                </th>
+
+                <th></th>
+
+            </tr>
+        </tfoot>
+
+    </table>
+
+</div>
+
+</section>
 
     </main>
 

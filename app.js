@@ -5,6 +5,16 @@
 let viticultores = JSON.parse(localStorage.getItem("viticultores")) || [];
 let entradas = JSON.parse(localStorage.getItem("entradas")) || [];
 
+let lias =
+JSON.parse(
+localStorage.getItem("lias")
+) || [];
+
+let hollejos =
+JSON.parse(
+localStorage.getItem("hollejos")
+) || [];
+
 let datosDeposito =
 JSON.parse(
 localStorage.getItem("datosDeposito")
@@ -26,11 +36,18 @@ document.querySelectorAll(".nav-btn").forEach(btn => {
         document.querySelectorAll(".page")
             .forEach(p => p.classList.remove("active"));
 
-            if(
+  if(
     btn.dataset.page ===
     "depositos"
 ){
     renderDepositos();
+}
+
+if(
+    btn.dataset.page ===
+    "totales"
+){
+    renderTotales();
 }
 
         document
@@ -1427,7 +1444,8 @@ function renderDepositos(){
 
                 yemaReal:0,
                 prensaReal:0,
-                ph:0
+                ph:0,
+                descubado:false
 
             };
 
@@ -1460,10 +1478,26 @@ Number(datos.ph || 0);
         :
         0;
 
-        const tr =
-        document.createElement("tr");
+        const claseFila =
+datos.descubado
+? "deposito-descubado"
+: "";
+
+       const tr =
+document.createElement("tr");
+
+tr.className = claseFila;
 
         tr.innerHTML = `
+
+        <td>
+
+<input
+type="checkbox"
+class="chkDeposito"
+data-clave="${clave}">
+
+</td>
 
         <td>${grupo.deposito}</td>
 
@@ -1603,6 +1637,60 @@ renderEntradas();
 renderDepositos();
 
 document
+.getElementById("btnDescubado")
+.addEventListener("click",()=>{
+
+    document
+    .querySelectorAll(".chkDeposito:checked")
+    .forEach(chk=>{
+
+        const clave =
+        chk.dataset.clave;
+
+        datosDeposito[clave].descubado = true;
+
+    });
+
+    guardarDepositos();
+    renderDepositos();
+
+});
+
+document
+.getElementById("btnQuitarDescubado")
+.addEventListener("click",()=>{
+
+    document
+    .querySelectorAll(".chkDeposito:checked")
+    .forEach(chk=>{
+
+        const clave =
+        chk.dataset.clave;
+
+        datosDeposito[clave].descubado = false;
+
+    });
+
+    guardarDepositos();
+    renderDepositos();
+
+});
+
+document
+.getElementById("checkAllDepositos")
+.addEventListener("change",function(){
+
+    document
+    .querySelectorAll(".chkDeposito")
+    .forEach(chk=>{
+
+        chk.checked = this.checked;
+
+    });
+
+});
+
+document
 .getElementById("checkAllEntradas")
 .addEventListener("change",function(){
 
@@ -1708,5 +1796,288 @@ document
 
 });
 
+// =======================================
+// TOTALES
+// =======================================
 
+const tablaTotalesUva =
+document.querySelector(
+"#tablaTotalesUva tbody"
+);
+
+const tablaTotalesLitros =
+document.querySelector(
+"#tablaTotalesLitros tbody"
+);
+
+function renderTotales(){
+
+    renderTotalesUva();
+    renderTotalesLitros();
+
+}
+
+function renderTotalesUva(){
+
+    tablaTotalesUva.innerHTML = "";
+
+    const variedades = [
+
+        "Tinta de Toro",
+        "Garnacha",
+        "Petit Verdot",
+        "Cabernet",
+        "Syrah",
+        "Merlot",
+        "Malvasía Aromática",
+        "Chardonnay",
+        "Verdejo",
+        "Malvasía Castellana",
+        "Albillo",
+        "Moscatel",
+        "Palomino"
+
+    ];
+
+    let totalKg = 0;
+
+    entradas.forEach(e=>{
+
+        totalKg += Number(
+            e.kgNeto || 0
+        );
+
+    });
+
+    variedades.forEach(variedad=>{
+
+        let kgVariedad = 0;
+
+        entradas.forEach(e=>{
+
+            if(
+                e.variedad === variedad
+            ){
+
+                kgVariedad += Number(
+                    e.kgNeto || 0
+                );
+
+            }
+
+        });
+
+        const porcentaje =
+        totalKg > 0
+        ?
+        (kgVariedad / totalKg) * 100
+        :
+        0;
+
+        const tr =
+        document.createElement("tr");
+
+        tr.innerHTML = `
+
+            <td>${variedad}</td>
+
+            <td>
+                ${kgVariedad.toFixed(0)}
+            </td>
+
+            <td>
+                ${porcentaje.toFixed(2)} %
+            </td>
+
+        `;
+
+        tablaTotalesUva.appendChild(tr);
+
+    });
+
+    const totalRow =
+    document.createElement("tr");
+
+    totalRow.style.fontWeight = "bold";
+
+    totalRow.innerHTML = `
+
+        <td>TOTAL</td>
+
+        <td>
+            ${totalKg.toFixed(0)}
+        </td>
+
+        <td>
+            100 %
+        </td>
+
+    `;
+
+    tablaTotalesUva.appendChild(totalRow);
+
+}
+
+function renderTotalesLitros(){
+
+    tablaTotalesLitros.innerHTML = "";
+
+    let totalYema = 0;
+    let totalPrensa = 0;
+    let totalPH = 0;
+
+    Object.values(datosDeposito)
+    .forEach(datos=>{
+
+        if(!datos.descubado) return;
+
+        totalYema += Number(
+            datos.yemaReal || 0
+        );
+
+        totalPrensa += Number(
+            datos.prensaReal || 0
+        );
+
+        totalPH += Number(
+            datos.ph || 0
+        );
+
+    });
+
+    const totalLitros =
+        totalYema +
+        totalPrensa +
+        totalPH;
+
+    const filas = [
+
+        {
+            nombre:"Litros Yema",
+            litros:totalYema
+        },
+
+        {
+            nombre:"Litros Prensa",
+            litros:totalPrensa
+        },
+
+        {
+            nombre:"Litros pH",
+            litros:totalPH
+        }
+
+    ];
+
+    filas.forEach(f=>{
+
+        const porcentaje =
+        totalLitros > 0
+        ?
+        (f.litros / totalLitros) * 100
+        :
+        0;
+
+        const tr =
+        document.createElement("tr");
+
+        tr.innerHTML = `
+
+            <td>${f.nombre}</td>
+
+            <td>
+                ${f.litros.toFixed(0)}
+            </td>
+
+            <td>
+                ${porcentaje.toFixed(2)} %
+            </td>
+
+        `;
+
+        tablaTotalesLitros.appendChild(tr);
+
+    });
+
+    const totalRow =
+    document.createElement("tr");
+
+    totalRow.style.fontWeight =
+    "bold";
+
+    totalRow.innerHTML = `
+
+        <td>TOTAL</td>
+
+        <td>
+            ${totalLitros.toFixed(0)}
+        </td>
+
+        <td>
+            100 %
+        </td>
+
+    `;
+
+    tablaTotalesLitros.appendChild(
+        totalRow
+    );
+
+}
+
+const liasTableBody =
+document.querySelector(
+"#liasTable tbody"
+);
+
+const hollejosTableBody =
+document.querySelector(
+"#hollejosTable tbody"
+);
+
+document
+.getElementById("addLia")
+.addEventListener("click",()=>{
+
+    lias.push({
+
+        fecha:"",
+        deposito:"",
+        litros:0
+
+    });
+
+    renderLias();
+
+});
+
+document
+.getElementById("addHollejo")
+.addEventListener("click",()=>{
+
+    hollejos.push({
+
+        fecha:"",
+        deposito:"",
+        kg:0
+
+    });
+
+    renderHollejos();
+
+});
+
+function guardarSubproductos(){
+
+    localStorage.setItem(
+        "lias",
+        JSON.stringify(lias)
+    );
+
+    localStorage.setItem(
+        "hollejos",
+        JSON.stringify(hollejos)
+    );
+
+}
 
