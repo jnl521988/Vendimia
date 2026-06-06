@@ -1284,15 +1284,15 @@ function(index,texto){
 
     if(!titular) return;
 
-    const vina =
-    titular.vinas.find(v=>{
+   const vina =
+titular.vinas.find(v=>{
 
-        return (
-        `${v.municipio} | Parcela ${v.parcela}`
-        === texto
-        );
+    return (
+    `${v.municipio} | Pol.${v.poligono} | Parc.${v.parcela} | Rec.${v.recinto}`
+    === texto
+    );
 
-    });
+});
 
     if(!vina) return;
 
@@ -1950,6 +1950,32 @@ function renderTotalesLitros(){
         totalPrensa +
         totalPH;
 
+        let kgDescubados = 0;
+
+Object.entries(datosDeposito)
+.forEach(([clave,datos])=>{
+
+    if(!datos.descubado) return;
+
+    const [deposito,vuelta] =
+    clave.split("-");
+
+    entradas.forEach(e=>{
+
+        if(
+            String(e.deposito) === deposito &&
+            String(e.vuelta) === vuelta
+        ){
+
+            kgDescubados +=
+            Number(e.kgNeto || 0);
+
+        }
+
+    });
+
+});
+
     const filas = [
 
         {
@@ -1972,11 +1998,11 @@ function renderTotalesLitros(){
     filas.forEach(f=>{
 
         const porcentaje =
-        totalLitros > 0
-        ?
-        (f.litros / totalLitros) * 100
-        :
-        0;
+kgDescubados > 0
+?
+(f.litros / kgDescubados) * 100
+:
+0;
 
         const tr =
         document.createElement("tr");
@@ -2013,9 +2039,18 @@ function renderTotalesLitros(){
             ${totalLitros.toFixed(0)}
         </td>
 
-        <td>
-            100 %
-        </td>
+       <td>
+    ${
+    kgDescubados > 0
+    ?
+    (
+        (totalLitros /
+        kgDescubados) * 100
+    ).toFixed(2)
+    :
+    0
+    } %
+</td>
 
     `;
 
@@ -2080,4 +2115,380 @@ function guardarSubproductos(){
     );
 
 }
+
+// =======================================
+// RENDER LÍAS
+// =======================================
+
+function renderLias(){
+
+    if(!liasTableBody) return;
+
+    liasTableBody.innerHTML = "";
+
+    let totalLitrosLias = 0;
+
+    let kgTotalesUva = 0;
+
+entradas.forEach(e=>{
+
+    kgTotalesUva +=
+    Number(e.kgNeto || 0);
+
+});
+
+    lias.forEach((lia,index)=>{
+
+        totalLitrosLias +=
+        Number(lia.litros || 0);
+
+    });
+
+    lias.forEach((lia,index)=>{
+
+        const porcentaje =
+kgTotalesUva > 0
+?
+(
+    Number(lia.litros) /
+    kgTotalesUva
+) * 100
+:
+0;
+
+        const tr =
+        document.createElement("tr");
+
+        tr.innerHTML = `
+
+        <td>
+
+            <input
+            type="date"
+            value="${lia.fecha}"
+
+            onchange="
+            lias[${index}].fecha =
+            this.value;
+            guardarSubproductos();
+            ">
+
+        </td>
+
+        <td>
+
+            <input
+            type="text"
+            value="${lia.deposito}"
+
+            onchange="
+            lias[${index}].deposito =
+            this.value;
+            guardarSubproductos();
+            ">
+
+        </td>
+
+        <td>
+
+            <input
+            type="number"
+            value="${lia.litros}"
+
+            onchange="
+            actualizarLia(
+            ${index},
+            this.value
+            )">
+
+        </td>
+
+        <td>
+        ${porcentaje.toFixed(2)} %
+        </td>
+
+        <td>
+
+            <button
+            class="danger"
+            onclick="
+            eliminarLia(
+            ${index}
+            )">
+
+            Eliminar
+
+            </button>
+
+        </td>
+
+        `;
+
+        liasTableBody.appendChild(tr);
+
+    });
+
+    document.getElementById(
+        "totalLias"
+    ).textContent =
+    totalLitrosLias.toFixed(0);
+
+   const porcentajeTotalLias =
+
+kgTotalesUva > 0
+
+?
+
+(
+    totalLitrosLias /
+    kgTotalesUva
+) * 100
+
+:
+
+0;
+
+document.getElementById(
+    "porcentajeLias"
+).textContent =
+
+porcentajeTotalLias.toFixed(2)
++ " %";
+
+}
+
+// =======================================
+// RENDER HOLLEJOS
+// =======================================
+
+function renderHollejos(){
+
+    if(!hollejosTableBody) return;
+
+    hollejosTableBody.innerHTML = "";
+
+    let totalKg = 0;
+
+    let kgDescubados = 0;
+
+Object.entries(datosDeposito)
+.forEach(([clave,datos])=>{
+
+    if(!datos.descubado) return;
+
+    const [deposito,vuelta] =
+    clave.split("-");
+
+    entradas.forEach(e=>{
+
+        if(
+            String(e.deposito) === deposito &&
+            String(e.vuelta) === vuelta
+        ){
+
+            kgDescubados +=
+            Number(e.kgNeto || 0);
+
+        }
+
+    });
+
+});
+
+    hollejos.forEach(h=>{
+
+        totalKg +=
+        Number(h.kg || 0);
+
+    });
+
+    hollejos.forEach((h,index)=>{
+
+       const porcentaje =
+kgDescubados > 0
+?
+(
+    Number(h.kg) /
+    kgDescubados
+) * 100
+:
+0;
+
+        const tr =
+        document.createElement("tr");
+
+        tr.innerHTML = `
+
+        <td>
+
+            <input
+            type="date"
+            value="${h.fecha}"
+
+            onchange="
+            hollejos[${index}].fecha =
+            this.value;
+            guardarSubproductos();
+            ">
+
+        </td>
+
+        <td>
+
+            <input
+            type="text"
+            value="${h.deposito}"
+
+            onchange="
+            hollejos[${index}].deposito =
+            this.value;
+            guardarSubproductos();
+            ">
+
+        </td>
+
+        <td>
+
+            <input
+            type="number"
+            value="${h.kg}"
+
+            onchange="
+            actualizarHollejo(
+            ${index},
+            this.value
+            )">
+
+        </td>
+
+        <td>
+        ${porcentaje.toFixed(2)} %
+        </td>
+
+        <td>
+
+            <button
+            class="danger"
+            onclick="
+            eliminarHollejo(
+            ${index}
+            )">
+
+            Eliminar
+
+            </button>
+
+        </td>
+
+        `;
+
+        hollejosTableBody.appendChild(tr);
+
+    });
+
+    document.getElementById(
+        "totalHollejos"
+    ).textContent =
+    totalKg.toFixed(0);
+
+    const porcentajeTotalHollejos =
+
+kgDescubados > 0
+
+?
+
+(
+    totalKg /
+    kgDescubados
+) * 100
+
+:
+
+0;
+
+document.getElementById(
+    "porcentajeHollejos"
+).textContent =
+
+porcentajeTotalHollejos.toFixed(2)
++ " %";
+
+}
+
+// =======================================
+// ACTUALIZAR LÍAS
+// =======================================
+
+window.actualizarLia =
+function(index,valor){
+
+    lias[index].litros =
+    Number(valor);
+
+    guardarSubproductos();
+
+    renderLias();
+
+};
+
+// =======================================
+// ACTUALIZAR HOLLEJOS
+// =======================================
+
+window.actualizarHollejo =
+function(index,valor){
+
+    hollejos[index].kg =
+    Number(valor);
+
+    guardarSubproductos();
+
+    renderHollejos();
+
+};
+
+// =======================================
+// ELIMINAR LÍA
+// =======================================
+
+window.eliminarLia =
+function(index){
+
+    if(
+        !confirm(
+            "Eliminar registro de lías?"
+        )
+    ) return;
+
+    lias.splice(index,1);
+
+    guardarSubproductos();
+
+    renderLias();
+
+};
+
+// =======================================
+// ELIMINAR HOLLEJO
+// =======================================
+
+window.eliminarHollejo =
+function(index){
+
+    if(
+        !confirm(
+            "Eliminar registro?"
+        )
+    ) return;
+
+    hollejos.splice(index,1);
+
+    guardarSubproductos();
+
+    renderHollejos();
+
+};
+
+renderLias();
+renderHollejos();
 
