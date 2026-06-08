@@ -59,26 +59,6 @@ if(
 });
 
 // =======================================
-// GUARDAR
-// =======================================
-
-document.getElementById("saveBtn").addEventListener("click", () => {
-
-    localStorage.setItem(
-        "viticultores",
-        JSON.stringify(viticultores)
-    );
-
-    localStorage.setItem(
-        "entradas",
-        JSON.stringify(entradas)
-    );
-
-    alert("Datos guardados correctamente");
-
-});
-
-// =======================================
 // EXPORTAR PDF
 // (de momento pendiente)
 // =======================================
@@ -136,6 +116,7 @@ document
     document.getElementById("vitDetalle").value = "";
 
     renderViticultores();
+    guardarDatos();
 
 });
 
@@ -488,6 +469,7 @@ window.toggleHistorial = function(index){
     !viticultores[index].abierto;
 
     renderViticultores();
+    guardarDatos();
 
 };
 
@@ -502,6 +484,7 @@ function(vitIndex,titIndex){
     !titular.mostrarVinas;
 
     renderViticultores();
+    guardarDatos();
 
 };
 
@@ -530,6 +513,7 @@ viticultores[index]
 });
 
 renderViticultores();
+guardarDatos();
 
 setTimeout(()=>{
 
@@ -574,6 +558,7 @@ function(vitIndex,anioIndex){
     );
 
     renderViticultores();
+    guardarDatos();
 
 };
 
@@ -606,6 +591,7 @@ function(index){
     vit.detalle = nuevoDetalle;
 
     renderViticultores();
+    guardarDatos();
 
 };
 
@@ -626,6 +612,7 @@ function(index){
     viticultores.splice(index,1);
 
     renderViticultores();
+    guardarDatos();
 
 };
 
@@ -659,6 +646,7 @@ mostrarVinas:false
     });
 
     renderViticultores();
+    guardarDatos();
 
 };
 
@@ -687,6 +675,7 @@ function(vitIndex,titIndex){
     titular.dni = dni;
 
     renderViticultores();
+    guardarDatos();
 
 };
 
@@ -707,6 +696,7 @@ function(vitIndex,titIndex){
     );
 
     renderViticultores();
+    guardarDatos();
 
 };
 
@@ -732,10 +722,10 @@ function(vitIndex,titIndex){
     Number(prompt("Kg Hectárea Máximo"));
 
     const vendimia =
-    prompt("mano o maquina");
+    prompt("Mano o Máquina");
 
     const anio =
-    prompt("Año viñedo");
+    prompt("Año Viñedo");
 
     const rendimiento =
     hectareas * kgHa;
@@ -768,6 +758,7 @@ function(vitIndex,titIndex){
     recalcularHectareas(vitIndex);
 
     renderViticultores();
+    guardarDatos();
 
 };
 
@@ -872,6 +863,7 @@ function(vitIndex,titIndex,vinaIndex){
     recalcularHectareas(vitIndex);
 
     renderViticultores();
+    guardarDatos();
 
 };
 
@@ -895,6 +887,7 @@ function(vitIndex,titIndex,vinaIndex){
     recalcularHectareas(vitIndex);
 
     renderViticultores();
+    guardarDatos();
     renderEntradas();
     renderDepositos();
 
@@ -1328,6 +1321,13 @@ function(index){
     entradas.splice(index,1);
 
     renderEntradas();
+    renderDepositos();
+
+    renderTotalesLitros();
+    renderLias();
+    renderHollejos();
+
+    guardarDatos();
 
 };
 
@@ -1391,6 +1391,21 @@ function guardarDatos(){
         JSON.stringify(entradas)
     );
 
+    localStorage.setItem(
+        "datosDeposito",
+        JSON.stringify(datosDeposito)
+    );
+
+    localStorage.setItem(
+        "lias",
+        JSON.stringify(lias)
+    );
+
+    localStorage.setItem(
+        "hollejos",
+        JSON.stringify(hollejos)
+    );
+
 }
 
     // =======================================
@@ -1435,6 +1450,17 @@ function renderDepositos(){
         Number(e.kgNeto);
 
     });
+
+    Object.keys(datosDeposito)
+.forEach(clave=>{
+
+    if(!grupos[clave]){
+
+        delete datosDeposito[clave];
+
+    }
+
+});
 
     Object.values(grupos)
     .forEach(grupo=>{
@@ -1590,9 +1616,10 @@ function(clave,valor){
     .yemaReal =
     Number(valor);
 
-    guardarDepositos();
+   guardarDepositos();
 
-    renderDepositos();
+   renderDepositos();
+   renderTotalesLitros();
 
 };
 
@@ -1606,6 +1633,7 @@ function(clave,valor){
     guardarDepositos();
 
     renderDepositos();
+    renderTotalesLitros();
 
 };
 
@@ -1619,20 +1647,13 @@ function(clave,valor){
     guardarDepositos();
 
     renderDepositos();
+    renderTotalesLitros();
 
 };
 
 function guardarDepositos(){
 
-    localStorage.setItem(
-
-        "datosDeposito",
-
-        JSON.stringify(
-            datosDeposito
-        )
-
-    );
+    guardarDatos();
 
 }
 
@@ -1747,6 +1768,11 @@ document
 
     renderEntradas();
     renderDepositos();
+
+    renderTotalesLitros();
+    renderLias();
+    renderHollejos();
+
     guardarDatos();
 
 });
@@ -1803,6 +1829,10 @@ document
     renderEntradas();
     renderDepositos();
     guardarDatos();
+
+    renderTotalesLitros();
+    renderLias();
+    renderHollejos();
 
 });
 
@@ -2115,15 +2145,7 @@ document
 
 function guardarSubproductos(){
 
-    localStorage.setItem(
-        "lias",
-        JSON.stringify(lias)
-    );
-
-    localStorage.setItem(
-        "hollejos",
-        JSON.stringify(hollejos)
-    );
+    guardarDatos();
 
 }
 
@@ -2439,6 +2461,7 @@ function(index,valor){
     guardarSubproductos();
 
     renderLias();
+    renderTotalesLitros();
 
 };
 
@@ -2455,6 +2478,7 @@ function(index,valor){
     guardarSubproductos();
 
     renderHollejos();
+    renderTotalesLitros();
 
 };
 
@@ -2476,6 +2500,7 @@ function(index){
     guardarSubproductos();
 
     renderLias();
+    renderTotalesLitros();
 
 };
 
@@ -2502,4 +2527,5 @@ function(index){
 
 renderLias();
 renderHollejos();
+renderTotalesLitros();
 
