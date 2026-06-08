@@ -1350,6 +1350,8 @@ function(index,valor){
     renderEntradas();
     renderDepositos();
     guardarDatos();
+    renderLias();
+    renderHollejos();
 
 };
 
@@ -1372,6 +1374,8 @@ function(index,valor){
     renderEntradas();
     renderDepositos();
     guardarDatos();
+    renderLias();
+    renderHollejos();
 
 };
 
@@ -1653,6 +1657,9 @@ document
 
     guardarDepositos();
     renderDepositos();
+    renderTotalesLitros();
+    renderLias();
+    renderHollejos();
 
 });
 
@@ -1673,6 +1680,9 @@ document
 
     guardarDepositos();
     renderDepositos();
+    renderTotalesLitros();
+    renderLias();
+    renderHollejos();
 
 });
 
@@ -1826,16 +1836,17 @@ function renderTotalesUva(){
         "Tinta de Toro",
         "Garnacha",
         "Petit Verdot",
-        "Cabernet",
+        "Cabernet Sauvignon",
         "Syrah",
         "Merlot",
         "Malvasía Aromática",
         "Chardonnay",
         "Verdejo",
         "Malvasía Castellana",
-        "Albillo",
+        "Albillo Real",
         "Moscatel",
-        "Palomino"
+        "Palomino",
+        "Godello"
 
     ];
 
