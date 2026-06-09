@@ -577,3 +577,93 @@ table td{
     margin-top:0;
 
 }
+
+.selector-campania{
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:15px;
+
+    margin-bottom:20px;
+
+}
+
+.selector-campania button{
+
+    background:#eb3225;
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:8px 14px;
+
+    font-size:18px;
+
+}
+
+#anioActual{
+
+    font-size:24px;
+    font-weight:bold;
+
+    min-width:90px;
+    text-align:center;
+
+}
+
+/* =======================================
+   TABLAS DE TOTALES
+======================================= */
+
+.totales-card{
+
+    background:#bebaba;
+
+    padding:15px;
+
+    margin-top:20px;
+
+    border-radius:10px;
+
+    box-shadow:0 2px 5px rgba(0,0,0,.1);
+
+}
+
+.totales-card table{
+
+    background:white;
+
+}
+
+.totales-card th{
+
+    background:#d28c87;
+
+    color:#111827;
+
+}
+
+.totales-card tfoot td{
+
+    background:#d28c87;
+
+    font-weight:bold;
+
+}
+
+.fila-total td{
+
+    background:#d28c87 !important;
+
+    font-weight:bold;
+
+}
+
+.fila-nota td {
+    background: #dde078;
+    font-size: 12px;
+    color: #0e0e0e;
+}

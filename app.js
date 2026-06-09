@@ -20,6 +20,11 @@ JSON.parse(
 localStorage.getItem("datosDeposito")
 ) || {};
 
+let anioActivo =
+Number(
+    localStorage.getItem("anioActivo")
+) || new Date().getFullYear();
+
 // =======================================
 // NAVEGACIÓN
 // =======================================
@@ -908,6 +913,8 @@ document
 
     entradas.push({
 
+        anio: anioActivo,
+
         fecha:"",
         hora:"",
 
@@ -1027,12 +1034,19 @@ function generarSelectVinas(
 
 function renderEntradas(){
 
-    entTableBody.innerHTML="";
+   entTableBody.innerHTML="";
 
-    entradas.forEach((e,index)=>{
+entradas.forEach((e,index)=>{
 
-        const tr =
-        document.createElement("tr");
+    if(
+        Number(e.anio || 2025)
+        !== anioActivo
+    ){
+        return;
+    }
+
+    const tr =
+    document.createElement("tr");
 
         tr.innerHTML = `
 
@@ -1425,11 +1439,16 @@ function renderDepositos(){
 
     entradas.forEach(e=>{
 
-        if(
-            !e.deposito ||
-            !e.vuelta ||
-            !e.kgNeto
-        ) return;
+    if(
+        Number(e.anio || 2025)
+        !== anioActivo
+    ) return;
+
+    if(
+        !e.deposito ||
+        !e.vuelta ||
+        !e.kgNeto
+    ) return;
 
         const clave =
         `${e.deposito}-${e.vuelta}`;
@@ -1451,16 +1470,7 @@ function renderDepositos(){
 
     });
 
-    Object.keys(datosDeposito)
-.forEach(clave=>{
-
-    if(!grupos[clave]){
-
-        delete datosDeposito[clave];
-
-    }
-
-});
+ 
 
     Object.values(grupos)
     .forEach(grupo=>{
@@ -1882,31 +1892,41 @@ function renderTotalesUva(){
 
     let totalKg = 0;
 
-    entradas.forEach(e=>{
+   entradas.forEach(e=>{
 
-        totalKg += Number(
-            e.kgNeto || 0
-        );
+    if(
+        Number(e.anio || 2025)
+        !== anioActivo
+    ) return;
 
-    });
+    totalKg += Number(
+        e.kgNeto || 0
+    );
+
+});
 
     variedades.forEach(variedad=>{
 
         let kgVariedad = 0;
 
-        entradas.forEach(e=>{
+       entradas.forEach(e=>{
 
-            if(
-                e.variedad === variedad
-            ){
+    if(
+        Number(e.anio || 2025)
+        !== anioActivo
+    ) return;
 
-                kgVariedad += Number(
-                    e.kgNeto || 0
-                );
+    if(
+        e.variedad === variedad
+    ){
 
-            }
+        kgVariedad += Number(
+            e.kgNeto || 0
+        );
 
-        });
+    }
+
+});
 
         const porcentaje =
         totalKg > 0
@@ -1941,6 +1961,9 @@ function renderTotalesUva(){
 
     totalRow.style.fontWeight = "bold";
 
+    totalRow.className =
+"fila-total";
+
     totalRow.innerHTML = `
 
         <td>TOTAL</td>
@@ -1967,24 +1990,31 @@ function renderTotalesLitros(){
     let totalPrensa = 0;
     let totalPH = 0;
 
-    Object.values(datosDeposito)
-    .forEach(datos=>{
+   Object.entries(datosDeposito)
+.forEach(([clave,datos])=>{
 
-        if(!datos.descubado) return;
+    if(!datos.descubado) return;
 
-        totalYema += Number(
-            datos.yemaReal || 0
-        );
+    const existeEnAnio =
+    entradas.some(e=>
 
-        totalPrensa += Number(
-            datos.prensaReal || 0
-        );
+        Number(e.anio || 2025)
+        === anioActivo &&
 
-        totalPH += Number(
-            datos.ph || 0
-        );
+        `${e.deposito}-${e.vuelta}`
+        === clave
 
-    });
+    );
+
+    if(!existeEnAnio) return;
+
+    totalYema += Number(datos.yemaReal || 0);
+
+    totalPrensa += Number(datos.prensaReal || 0);
+
+    totalPH += Number(datos.ph || 0);
+
+});
 
     const totalLitros =
         totalYema +
@@ -2002,6 +2032,11 @@ Object.entries(datosDeposito)
     clave.split("-");
 
     entradas.forEach(e=>{
+
+        if(
+    Number(e.anio || 2025)
+    !== anioActivo
+) return;
 
         if(
             String(e.deposito) === deposito &&
@@ -2072,6 +2107,9 @@ kgDescubados > 0
     totalRow.style.fontWeight =
     "bold";
 
+    totalRow.className =
+"fila-total";
+
     totalRow.innerHTML = `
 
         <td>TOTAL</td>
@@ -2099,6 +2137,17 @@ kgDescubados > 0
         totalRow
     );
 
+    const notaRow = document.createElement("tr");
+notaRow.className = "fila-nota";
+
+notaRow.innerHTML = `
+    <td colspan="3">
+        NOTA: LOS LITROS SON CORRESPONDIENTES A LOS DEPÓSITOS MARCADOS COMO DESCUBADOS Y EL PORCENTAJE CON RESPECTO A LOS KGS DE UVA DESCUBADOS
+    </td>
+`;
+
+tablaTotalesLitros.appendChild(notaRow);
+
 }
 
 const liasTableBody =
@@ -2117,6 +2166,8 @@ document
 
     lias.push({
 
+        anio: anioActivo,
+
         fecha:"",
         deposito:"",
         litros:0
@@ -2132,6 +2183,8 @@ document
 .addEventListener("click",()=>{
 
     hollejos.push({
+
+        anio: anioActivo,
 
         fecha:"",
         deposito:"",
@@ -2165,6 +2218,11 @@ function renderLias(){
 
 entradas.forEach(e=>{
 
+    if(
+        Number(e.anio || 2025)
+        !== anioActivo
+    ) return;
+
     kgTotalesUva +=
     Number(e.kgNeto || 0);
 
@@ -2172,22 +2230,32 @@ entradas.forEach(e=>{
 
     lias.forEach((lia,index)=>{
 
-        totalLitrosLias +=
-        Number(lia.litros || 0);
+    if(
+        Number(lia.anio || 2025)
+        !== anioActivo
+    ) return;
 
-    });
+    totalLitrosLias +=
+    Number(lia.litros || 0);
 
-    lias.forEach((lia,index)=>{
+});
 
-        const porcentaje =
-kgTotalesUva > 0
-?
-(
-    Number(lia.litros) /
-    kgTotalesUva
-) * 100
-:
-0;
+  lias.forEach((lia,index)=>{
+
+    if(
+        Number(lia.anio || 2025)
+        !== anioActivo
+    ) return;
+
+    const porcentaje =
+    kgTotalesUva > 0
+    ?
+    (
+        Number(lia.litros) /
+        kgTotalesUva
+    ) * 100
+    :
+    0;
 
         const tr =
         document.createElement("tr");
@@ -2288,7 +2356,19 @@ document.getElementById(
 porcentajeTotalLias.toFixed(2)
 + " %";
 
+const notaRow = document.createElement("tr");
+notaRow.className = "fila-nota";
+
+notaRow.innerHTML = `
+    <td colspan="5">
+        NOTA: LOS LITROS DE LÍAS ES LO QUE VA SALIENDO DE LOS DEPÓSITOS Y EL PORCENTAJE ES CON RESPECTO A LOS KGS DE UVA TOTALES EN LAS ENTRADAS
+    </td>
+`;
+
+liasTableBody.appendChild(notaRow);
+
 }
+
 
 // =======================================
 // RENDER HOLLEJOS
@@ -2314,6 +2394,11 @@ Object.entries(datosDeposito)
 
     entradas.forEach(e=>{
 
+    if(
+        Number(e.anio || 2025)
+        !== anioActivo
+    ) return;
+
         if(
             String(e.deposito) === deposito &&
             String(e.vuelta) === vuelta
@@ -2328,14 +2413,24 @@ Object.entries(datosDeposito)
 
 });
 
-    hollejos.forEach(h=>{
+   hollejos.forEach(h=>{
 
-        totalKg +=
-        Number(h.kg || 0);
+    if(
+        Number(h.anio || 2025)
+        !== anioActivo
+    ) return;
 
-    });
+    totalKg +=
+    Number(h.kg || 0);
+
+});
 
     hollejos.forEach((h,index)=>{
+
+    if(
+        Number(h.anio || 2025)
+        !== anioActivo
+    ) return;
 
        const porcentaje =
 kgDescubados > 0
@@ -2446,6 +2541,17 @@ document.getElementById(
 porcentajeTotalHollejos.toFixed(2)
 + " %";
 
+const notaRow = document.createElement("tr");
+notaRow.className = "fila-nota";
+
+notaRow.innerHTML = `
+    <td colspan="5">
+        NOTA: LOS KGS DE HOLLEJOS ES LO QUE VA SALIENDO DE LAS PRENSAS Y EL PORCENTAJE ES CON RESPECTO A LOS KGS DE UVA DESCUBADOS
+    </td>
+`;
+
+hollejosTableBody.appendChild(notaRow);
+
 }
 
 // =======================================
@@ -2525,7 +2631,71 @@ function(index){
 
 };
 
+renderViticultores();
+renderEntradas();
+renderDepositos();
 renderLias();
 renderHollejos();
 renderTotalesLitros();
+actualizarSelectorAnio();
+
+function actualizarSelectorAnio(){
+
+    const span =
+    document.getElementById(
+        "anioActual"
+    );
+
+    if(span){
+
+        span.textContent =
+        anioActivo;
+
+    }
+
+}
+
+document
+.getElementById("anioAnterior")
+.addEventListener("click",()=>{
+
+    anioActivo--;
+
+    localStorage.setItem(
+        "anioActivo",
+        anioActivo
+    );
+
+    actualizarSelectorAnio();
+
+    renderEntradas();
+    renderDepositos();
+    renderTotalesUva();
+    renderTotalesLitros();
+    renderLias();
+    renderHollejos();
+
+});
+
+document
+.getElementById("anioSiguiente")
+.addEventListener("click",()=>{
+
+    anioActivo++;
+
+    localStorage.setItem(
+        "anioActivo",
+        anioActivo
+    );
+
+    actualizarSelectorAnio();
+
+    renderEntradas();
+    renderDepositos();
+    renderTotalesUva();
+    renderTotalesLitros();
+    renderLias();
+    renderHollejos();
+
+});
 
