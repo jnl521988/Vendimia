@@ -65,14 +65,341 @@ if(
 
 // =======================================
 // EXPORTAR PDF
-// (de momento pendiente)
 // =======================================
 
-document.getElementById("pdfBtn").addEventListener("click", () => {
+document
+.getElementById("pdfBtn")
+.addEventListener("click",exportarPDF);
 
-    alert("PDF disponible en Fase 4");
+function exportarPDF(){
+
+    if(
+        document
+        .getElementById("page-entradas")
+        .classList.contains("active")
+    ){
+
+        exportarEntradasPDF();
+        return;
+
+    }
+
+    if(
+        document
+        .getElementById("page-depositos")
+        .classList.contains("active")
+    ){
+
+        exportarDepositosPDF();
+        return;
+
+    }
+
+    if(
+        document
+        .getElementById("page-totales")
+        .classList.contains("active")
+    ){
+
+        exportarTotalesPDF();
+        return;
+
+    }
+
+}
+
+function exportarEntradasPDF(){
+
+    const { jsPDF } = window.jspdf;
+
+    const doc =
+new jspdf.jsPDF(
+    "landscape",
+    "mm",
+    "a4"
+);
+
+    doc.text(
+        "Entradas de Uva",
+        14,
+        15
+    );
+
+    doc.autoTable({
+
+        html:"#entradasTable",
+
+        startY:20,
+
+        styles:{
+            fontSize:6
+        },
+
+        tableWidth:"wrap"
+
+    });
+
+    doc.save(
+        `Entradas_Uva_${anioActivo}.pdf`
+    );
+
+}
+
+function exportarDepositosPDF(){
+
+    const { jsPDF } = window.jspdf;
+
+    const doc =
+    new jsPDF(
+        "p",
+        "mm",
+        "a4"
+    );
+
+    doc.text(
+        "Depositos Encubados",
+        14,
+        15
+    );
+
+   doc.autoTable({
+
+head:[[
+"Descubado",
+"Depósito",
+"Vuelta",
+"Kg",
+"Yema Prev",
+"Prensa Prev",
+"Yema Real",
+"Prensa Real",
+"pH",
+"Total",
+"Total+pH"
+]],
+
+body:obtenerDatosDepositosPDF(),
+
+styles:{
+    fontSize:8
+}
 
 });
+
+    doc.save(
+        `Depositos_${anioActivo}.pdf`
+    );
+
+}
+
+function obtenerDatosDepositosPDF(){
+
+    const filas = [];
+
+    entradas.forEach(e=>{
+
+        if(
+            Number(e.anio || 2025)
+            !== anioActivo
+        ) return;
+
+        if(
+            !e.deposito ||
+            !e.vuelta ||
+            !e.kgNeto
+        ) return;
+
+        const clave =
+        `${e.deposito}-${e.vuelta}`;
+
+        const datos =
+        datosDeposito[clave] || {};
+
+        const kg =
+        Number(e.kgNeto || 0);
+
+        const yemaPrev =
+        kg * 0.60;
+
+        const prensaPrev =
+        kg * 0.15;
+
+        const totalLitros =
+        Number(datos.yemaReal || 0) +
+        Number(datos.prensaReal || 0);
+
+        const totalPH =
+        totalLitros +
+        Number(datos.ph || 0);
+
+        filas.push([
+
+            datos.descubado
+            ? "SI"
+            : "NO",
+
+            e.deposito,
+            e.vuelta,
+
+            kg.toFixed(0),
+
+            yemaPrev.toFixed(0),
+            prensaPrev.toFixed(0),
+
+            Number(
+                datos.yemaReal || 0
+            ).toFixed(0),
+
+            Number(
+                datos.prensaReal || 0
+            ).toFixed(0),
+
+            Number(
+                datos.ph || 0
+            ).toFixed(0),
+
+            totalLitros.toFixed(0),
+
+            totalPH.toFixed(0)
+
+        ]);
+
+    });
+
+    return filas;
+
+}
+
+function exportarTotalesPDF(){
+
+    const { jsPDF } = window.jspdf;
+
+    const doc =
+    new jsPDF(
+        "p",
+        "mm",
+        "a4"
+    );
+
+    doc.text(
+        "Totales Uva",
+        14,
+        15
+    );
+
+    doc.autoTable({
+
+        html:"#tablaTotalesUva",
+
+        startY:20
+
+    });
+
+    doc.addPage();
+
+    doc.text(
+        "Resumen Litros",
+        14,
+        15
+    );
+
+    doc.autoTable({
+
+        html:"#tablaTotalesLitros",
+
+        startY:20
+
+    });
+
+    doc.addPage();
+
+    doc.text(
+        "Lias",
+        14,
+        15
+    );
+
+    doc.autoTable({
+
+        html:"#liasTable",
+
+        startY:20
+
+    });
+
+    doc.addPage();
+
+    doc.text(
+        "Hollejos",
+        14,
+        15
+    );
+
+    doc.autoTable({
+
+        html:"#hollejosTable",
+
+        startY:20
+
+    });
+
+    doc.save(
+        `Totales_${anioActivo}.pdf`
+    );
+
+}
+
+function obtenerDatosLiasPDF(){
+
+    const filas=[];
+
+    lias.forEach(l=>{
+
+        if(
+            Number(l.anio || 2025)
+            !== anioActivo
+        ) return;
+
+        filas.push([
+
+            l.fecha,
+            l.deposito,
+            l.litros
+
+        ]);
+
+    });
+
+    return filas;
+
+}
+
+function obtenerDatosHollejosPDF(){
+
+    const filas=[];
+
+    hollejos.forEach(h=>{
+
+        if(
+            Number(h.anio || 2025)
+            !== anioActivo
+        ) return;
+
+        filas.push([
+
+            h.fecha,
+            h.deposito,
+            h.kg
+
+        ]);
+
+    });
+
+    return filas;
+
+}
+
+
 
 // =======================================
 // TABLA VITICULTORES
@@ -134,6 +461,69 @@ function renderViticultores() {
     vitTableBody.innerHTML = "";
 
     viticultores.forEach((vit, index) => {
+
+        const historialAutomatico = {};
+
+        vit.titulares.forEach(titular=>{
+
+    entradas.forEach(e=>{
+
+        if(
+            e.titular !== titular.nombre
+        ) return;
+
+        const anio =
+        Number(e.anio || 2025);
+
+        if(!historialAutomatico[anio]){
+
+            historialAutomatico[anio] = 0;
+
+        }
+
+        historialAutomatico[anio] +=
+        Number(e.kgNeto || 0);
+
+    });
+
+});
+
+const historialCombinado = [];
+
+vit.historial.forEach((h,i)=>{
+
+    historialCombinado.push({
+
+    tipo:"M (Real)",
+
+    indiceReal:i,
+
+    anio:Number(h.anio),
+
+    kg:Number(h.kg)
+
+});
+
+});
+
+Object.entries(historialAutomatico)
+.forEach(([anio,kg])=>{
+
+    historialCombinado.push({
+
+        tipo:"A",
+
+        anio:Number(anio),
+
+        kg:Number(kg)
+
+    });
+
+});
+
+historialCombinado.sort(
+(a,b)=>a.anio-b.anio
+);
 
         // FILA PRINCIPAL
 
@@ -203,22 +593,30 @@ onclick="agregarAnio(${index})">
 <thead>
 
 <tr>
+    <th>Tipo</th>
     <th>Año Campaña</th>
     <th>Kgs Uva</th>
     <th>Acciones</th>
 </tr>
-
 </thead>
 
 <tbody>
 
 ${
-vit.historial.map((h,i)=>`
+historialCombinado.map((h,i)=>`
 
 <tr>
 
 <td>
+${h.tipo}
+</td>
 
+<td>
+
+${
+h.tipo === "M (Real)"
+?
+`
 <input
 type="number"
 value="${h.anio}"
@@ -226,15 +624,23 @@ value="${h.anio}"
 onchange="
 actualizarAnio(
 ${index},
-${i},
+${h.indiceReal}
 this.value
 )
 ">
+`
+:
+h.anio
+}
 
 </td>
 
 <td>
 
+${
+h.tipo === "M (Real)"
+?
+`
 <input
 type="number"
 value="${h.kg}"
@@ -242,27 +648,37 @@ value="${h.kg}"
 onchange="
 actualizarKg(
 ${index},
-${i},
+${h.indiceReal}
 this.value
 )
 ">
+`
+:
+h.kg.toFixed(0)
+}
 
 </td>
 
 <td>
 
+${
+h.tipo === "M (Real)"
+?
+`
 <button
 class="danger"
 onclick="
 eliminarAnio(
 ${index},
-${i}
+${h.indiceReal}
 )
 ">
-
 Eliminar
-
 </button>
+`
+:
+"Automático"
+}
 
 </td>
 
@@ -1336,6 +1752,7 @@ function(index){
 
     renderEntradas();
     renderDepositos();
+    renderViticultores();
 
     renderTotalesLitros();
     renderLias();
@@ -1364,6 +1781,7 @@ function(index,valor){
     renderEntradas();
     renderDepositos();
     guardarDatos();
+    renderViticultores();
     renderLias();
     renderHollejos();
 
@@ -1388,6 +1806,7 @@ function(index,valor){
     renderEntradas();
     renderDepositos();
     guardarDatos();
+    renderViticultores();
     renderLias();
     renderHollejos();
 
