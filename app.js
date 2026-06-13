@@ -69,333 +69,359 @@ if(
 
 document
 .getElementById("pdfBtn")
-.addEventListener("click",exportarPDF);
+.addEventListener("click", exportarPDF);
 
 function exportarPDF(){
 
-    if(
-        document
-        .getElementById("page-entradas")
-        .classList.contains("active")
-    ){
-
-        exportarEntradasPDF();
-        return;
-
-    }
-
-    if(
-        document
-        .getElementById("page-depositos")
-        .classList.contains("active")
-    ){
-
-        exportarDepositosPDF();
-        return;
-
-    }
-
-    if(
-        document
-        .getElementById("page-totales")
-        .classList.contains("active")
-    ){
-
-        exportarTotalesPDF();
-        return;
-
-    }
-
-}
-
-function exportarEntradasPDF(){
-
     const { jsPDF } = window.jspdf;
 
-    const doc =
-new jspdf.jsPDF(
-    "landscape",
-    "mm",
-    "a4"
-);
+    const pagina =
+    document.querySelector(".page.active");
 
-    doc.text(
-        "Entradas de Uva",
-        14,
-        15
-    );
+    // =====================================
+    // ENTRADAS DE UVA
+    // =====================================
 
-    doc.autoTable({
+    if(pagina.id === "page-entradas"){
 
-        html:"#entradasTable",
+        const doc =
+        new jsPDF("landscape");
 
-        startY:20,
+        doc.setFontSize(16);
 
-        styles:{
-            fontSize:6
-        },
+        doc.text(
+            `ENTRADAS DE UVA - CAMPAÑA ${anioActivo}`,
+            14,
+            15
+        );
 
-        tableWidth:"wrap"
+        const filas = [];
 
-    });
+        entradas.forEach(e=>{
 
-    doc.save(
-        `Entradas_Uva_${anioActivo}.pdf`
-    );
+            if(
+                Number(e.anio || 2025)
+                !== anioActivo
+            ) return;
 
-}
+            filas.push([
 
-function exportarDepositosPDF(){
+                e.fecha || "",
+                e.hora || "",
 
-    const { jsPDF } = window.jspdf;
+                e.titular || "",
+                e.vina || "",
 
-    const doc =
-    new jsPDF(
-        "p",
-        "mm",
-        "a4"
-    );
+                e.dni || "",
 
-    doc.text(
-        "Depositos Encubados",
-        14,
-        15
-    );
+                e.municipio || "",
+                e.poligono || "",
+                e.parcela || "",
+                e.recinto || "",
 
-   doc.autoTable({
+                e.variedad || "",
+                e.vendimia || "",
 
-head:[[
-"Descubado",
-"Depósito",
-"Vuelta",
-"Kg",
-"Yema Prev",
-"Prensa Prev",
-"Yema Real",
-"Prensa Real",
-"pH",
-"Total",
-"Total+pH"
-]],
+                e.kgBruto || 0,
+                e.kgTara || 0,
+                e.kgNeto || 0,
 
-body:obtenerDatosDepositosPDF(),
+                e.grado || 0,
 
-styles:{
-    fontSize:8
-}
+                e.deposito || "",
+                e.vuelta || ""
 
-});
+            ]);
 
-    doc.save(
-        `Depositos_${anioActivo}.pdf`
-    );
+        });
 
-}
+        doc.autoTable({
 
-function obtenerDatosDepositosPDF(){
+            startY:25,
 
-    const filas = [];
+            head:[[
+                "Fecha",
+                "Hora",
+                "Titular",
+                "Viña",
+                "DNI",
+                "Municipio",
+                "Pol",
+                "Parc",
+                "Rec",
+                "Variedad",
+                "Vendimia",
+                "Kg Bruto",
+                "Kg Tara",
+                "Kg Neto",
+                "Grado",
+                "Depósito",
+                "Vuelta"
+            ]],
 
-    entradas.forEach(e=>{
+            body:filas,
 
-        if(
-            Number(e.anio || 2025)
-            !== anioActivo
-        ) return;
+            theme:"grid",
 
-        if(
-            !e.deposito ||
-            !e.vuelta ||
-            !e.kgNeto
-        ) return;
+            styles:{
+                fontSize:6,
+                cellPadding:1
+            },
 
-        const clave =
-        `${e.deposito}-${e.vuelta}`;
+            headStyles:{
+                fillColor:[210,140,135]
+            }
 
-        const datos =
-        datosDeposito[clave] || {};
+        });
 
-        const kg =
-        Number(e.kgNeto || 0);
+        doc.save(
+            `Entradas_Uva_${anioActivo}.pdf`
+        );
 
-        const yemaPrev =
-        kg * 0.60;
+        return;
+    }
 
-        const prensaPrev =
-        kg * 0.15;
+    // =====================================
+    // DEPÓSITOS ENCUBADOS
+    // =====================================
 
-        const totalLitros =
-        Number(datos.yemaReal || 0) +
-        Number(datos.prensaReal || 0);
+    if(pagina.id === "page-depositos"){
 
-        const totalPH =
-        totalLitros +
-        Number(datos.ph || 0);
+        const doc =
+        new jsPDF("portrait");
 
-        filas.push([
+        doc.setFontSize(16);
 
-            datos.descubado
-            ? "SI"
-            : "NO",
+        doc.text(
+            `DEPÓSITOS ENCUBADOS - CAMPAÑA ${anioActivo}`,
+            14,
+            15
+        );
 
-            e.deposito,
-            e.vuelta,
+        const filas = [];
 
-            kg.toFixed(0),
+        const grupos = {};
 
-            yemaPrev.toFixed(0),
-            prensaPrev.toFixed(0),
+        entradas.forEach(e=>{
 
-            Number(
-                datos.yemaReal || 0
-            ).toFixed(0),
+            if(
+                Number(e.anio || 2025)
+                !== anioActivo
+            ) return;
 
-            Number(
-                datos.prensaReal || 0
-            ).toFixed(0),
+            if(
+                !e.deposito ||
+                !e.vuelta ||
+                !e.kgNeto
+            ) return;
 
-            Number(
-                datos.ph || 0
-            ).toFixed(0),
+            const clave =
+            `${e.deposito}-${e.vuelta}`;
 
-            totalLitros.toFixed(0),
+            if(!grupos[clave]){
 
-            totalPH.toFixed(0)
+                grupos[clave]={
 
-        ]);
+                    deposito:e.deposito,
+                    vuelta:e.vuelta,
+                    kg:0
 
-    });
+                };
 
-    return filas;
+            }
 
-}
+            grupos[clave].kg +=
+            Number(e.kgNeto);
 
-function exportarTotalesPDF(){
+        });
 
-    const { jsPDF } = window.jspdf;
+        const colores = [];
 
-    const doc =
-    new jsPDF(
-        "p",
-        "mm",
-        "a4"
-    );
+        Object.values(grupos)
+        .forEach(grupo=>{
 
-    doc.text(
-        "Totales Uva",
-        14,
-        15
-    );
+            const clave =
+            `${grupo.deposito}-${grupo.vuelta}`;
 
-    doc.autoTable({
+            const datos =
+            datosDeposito[clave] || {};
 
-        html:"#tablaTotalesUva",
+            const yemaPrev =
+            grupo.kg * 0.60;
 
-        startY:20
+            const prensaPrev =
+            grupo.kg * 0.15;
 
-    });
+            const totalLitros =
+            Number(datos.yemaReal || 0) +
+            Number(datos.prensaReal || 0);
 
-    doc.addPage();
+            const totalPH =
+            totalLitros +
+            Number(datos.ph || 0);
 
-    doc.text(
-        "Resumen Litros",
-        14,
-        15
-    );
+            const porcentaje =
+            grupo.kg > 0
+            ?
+            (totalLitros / grupo.kg)*100
+            :
+            0;
 
-    doc.autoTable({
+            filas.push([
 
-        html:"#tablaTotalesLitros",
+                grupo.deposito,
+                grupo.vuelta,
 
-        startY:20
+                grupo.kg.toFixed(0),
 
-    });
+                yemaPrev.toFixed(0),
+                prensaPrev.toFixed(0),
 
-    doc.addPage();
+                datos.yemaReal || 0,
+                datos.prensaReal || 0,
+                datos.ph || 0,
 
-    doc.text(
-        "Lias",
-        14,
-        15
-    );
+                totalLitros.toFixed(0),
 
-    doc.autoTable({
+                porcentaje.toFixed(2)+" %",
 
-        html:"#liasTable",
+                totalPH.toFixed(0)
 
-        startY:20
+            ]);
 
-    });
+            colores.push(
+                datos.descubado === true
+            );
 
-    doc.addPage();
+        });
 
-    doc.text(
-        "Hollejos",
-        14,
-        15
-    );
+        doc.autoTable({
 
-    doc.autoTable({
+            startY:25,
 
-        html:"#hollejosTable",
+            head:[[
+                "Depósito",
+                "Vuelta",
+                "Kg Uva",
+                "Yema Prev.",
+                "Prensa Prev.",
+                "Yema Real",
+                "Prensa Real",
+                "pH",
+                "Litros",
+                "% Rto.",
+                "Total"
+            ]],
 
-        startY:20
+            body:filas,
 
-    });
+            theme:"grid",
 
-    doc.save(
-        `Totales_${anioActivo}.pdf`
-    );
+            headStyles:{
+                fillColor:[210,140,135]
+            },
 
-}
+            didParseCell:function(data){
 
-function obtenerDatosLiasPDF(){
+                if(
+                    data.section === "body" &&
+                    colores[data.row.index]
+                ){
 
-    const filas=[];
+                    data.cell.styles.fillColor =
+                    [152,209,180];
 
-    lias.forEach(l=>{
+                }
 
-        if(
-            Number(l.anio || 2025)
-            !== anioActivo
-        ) return;
+            }
 
-        filas.push([
+        });
 
-            l.fecha,
-            l.deposito,
-            l.litros
+        doc.save(
+            `Depositos_${anioActivo}.pdf`
+        );
 
-        ]);
+        return;
+    }
 
-    });
+    // =====================================
+    // TOTALES
+    // =====================================
 
-    return filas;
+    if(pagina.id === "page-totales"){
 
-}
+        const doc =
+        new jsPDF("portrait");
 
-function obtenerDatosHollejosPDF(){
+        const tablas = [
 
-    const filas=[];
+            {
+                titulo:"RESUMEN DE UVAS",
+                id:"tablaTotalesUva"
+            },
 
-    hollejos.forEach(h=>{
+            {
+                titulo:"RESUMEN DE LITROS",
+                id:"tablaTotalesLitros"
+            },
 
-        if(
-            Number(h.anio || 2025)
-            !== anioActivo
-        ) return;
+            {
+                titulo:"LÍAS DEL VINO",
+                id:"liasTable"
+            },
 
-        filas.push([
+            {
+                titulo:"HOLLEJOS PRENSADOS",
+                id:"hollejosTable"
+            }
 
-            h.fecha,
-            h.deposito,
-            h.kg
+        ];
 
-        ]);
+        tablas.forEach((tabla,index)=>{
 
-    });
+            if(index>0){
 
-    return filas;
+                doc.addPage();
+
+            }
+
+            doc.setFontSize(16);
+
+            doc.text(
+                `${tabla.titulo} - CAMPAÑA ${anioActivo}`,
+                14,
+                15
+            );
+
+            doc.autoTable({
+
+                html:`#${tabla.id}`,
+
+                startY:25,
+
+                theme:"grid",
+
+                headStyles:{
+                    fillColor:[210,140,135]
+                },
+
+                footStyles:{
+                    fillColor:[210,140,135]
+                },
+
+                styles:{
+                    fontSize:9
+                }
+
+            });
+
+        });
+
+        doc.save(
+            `Totales_${anioActivo}.pdf`
+        );
+
+    }
 
 }
 
