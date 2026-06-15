@@ -355,27 +355,31 @@ function exportarPDF(){
 
         const tablas = [
 
-            {
-                titulo:"RESUMEN DE UVAS",
-                id:"tablaTotalesUva"
-            },
+    {
+        titulo:"RESUMEN DE UVAS",
+        id:"tablaTotalesUva",
+        manual:false
+    },
 
-            {
-                titulo:"RESUMEN DE LITROS",
-                id:"tablaTotalesLitros"
-            },
+    {
+        titulo:"RESUMEN DE LITROS",
+        id:"tablaTotalesLitros",
+        manual:false
+    },
 
-            {
-                titulo:"LÍAS DEL VINO",
-                id:"liasTable"
-            },
+    {
+        titulo:"LÍAS DEL VINO",
+        id:"liasTable",
+        manual:true
+    },
 
-            {
-                titulo:"HOLLEJOS PRENSADOS",
-                id:"hollejosTable"
-            }
+    {
+        titulo:"HOLLEJOS PRENSADOS",
+        id:"hollejosTable",
+        manual:true
+    }
 
-        ];
+];
 
         tablas.forEach((tabla,index)=>{
 
@@ -393,27 +397,135 @@ function exportarPDF(){
                 15
             );
 
-            doc.autoTable({
+           if(!tabla.manual){
 
-                html:`#${tabla.id}`,
+    doc.autoTable({
 
-                startY:25,
+        html:`#${tabla.id}`,
 
-                theme:"grid",
+        startY:25,
 
-                headStyles:{
-                    fillColor:[210,140,135]
-                },
+        theme:"grid",
 
-                footStyles:{
-                    fillColor:[210,140,135]
-                },
+        headStyles:{
+            fillColor:[210,140,135]
+        },
 
-                styles:{
-                    fontSize:9
-                }
+        footStyles:{
+            fillColor:[210,140,135]
+        },
 
-            });
+        styles:{
+            fontSize:9
+        }
+
+    });
+
+}else{
+
+    const tablaDOM =
+    document.getElementById(tabla.id);
+
+    const cabecera = [];
+
+    tablaDOM.querySelectorAll("thead th")
+    .forEach(th=>{
+
+        if(
+            th.textContent.trim() !== "Acciones"
+        ){
+
+            cabecera.push(
+                th.textContent.trim()
+            );
+
+        }
+
+    });
+
+    const filas = [];
+
+    tablaDOM.querySelectorAll("tbody tr")
+    .forEach(tr=>{
+
+        const fila = [];
+
+        tr.querySelectorAll("td")
+        .forEach(td=>{
+
+            if(td.querySelector("button")) return;
+
+            const input =
+            td.querySelector("input");
+
+            if(input){
+
+                fila.push(input.value);
+
+            }else{
+
+                fila.push(
+                    td.textContent.trim()
+                );
+
+            }
+
+        });
+
+        filas.push(fila);
+
+    });
+
+    const pie = [];
+
+    const filaPie = [];
+
+    tablaDOM.querySelectorAll("tfoot th")
+    .forEach(th=>{
+
+        if(th.textContent.trim()){
+
+            filaPie.push(
+                th.textContent.trim()
+            );
+
+        }
+
+    });
+
+    if(filaPie.length){
+
+        pie.push(filaPie);
+
+    }
+
+    doc.autoTable({
+
+        startY:25,
+
+        head:[cabecera],
+
+        body:filas,
+
+        foot:pie,
+
+        theme:"grid",
+
+        headStyles:{
+            fillColor:[210,140,135]
+        },
+
+        footStyles:{
+            fillColor:[210,140,135]
+        },
+
+        styles:{
+            fontSize:9
+        }
+
+    });
+
+}
 
         });
 
