@@ -1988,6 +1988,8 @@ document.querySelector(
 "#depositosTable tbody"
 );
 
+
+
 function renderDepositos(){
 
     depTableBody.innerHTML = "";
@@ -2007,8 +2009,8 @@ function renderDepositos(){
         !e.kgNeto
     ) return;
 
-        const clave =
-        `${e.deposito}-${e.vuelta}`;
+       const clave =
+`${anioActivo}-${e.deposito}-${e.vuelta}`;
 
         if(!grupos[clave]){
 
@@ -2032,8 +2034,8 @@ function renderDepositos(){
     Object.values(grupos)
     .forEach(grupo=>{
 
-        const clave =
-        `${grupo.deposito}-${grupo.vuelta}`;
+       const clave =
+`${anioActivo}-${grupo.deposito}-${grupo.vuelta}`;
 
         if(!datosDeposito[clave]){
 
@@ -2553,15 +2555,13 @@ function renderTotalesLitros(){
     if(!datos.descubado) return;
 
     const existeEnAnio =
-    entradas.some(e=>
+entradas.some(e =>
 
-        Number(e.anio || 2025)
-        === anioActivo &&
+    Number(e.anio || 2025) === anioActivo &&
 
-        `${e.deposito}-${e.vuelta}`
-        === clave
+    `${anioActivo}-${e.deposito}-${e.vuelta}` === clave
 
-    );
+);
 
     if(!existeEnAnio) return;
 
@@ -2585,8 +2585,8 @@ Object.entries(datosDeposito)
 
     if(!datos.descubado) return;
 
-    const [deposito,vuelta] =
-    clave.split("-");
+    const [anio, deposito, vuelta] =
+clave.split("-");
 
     entradas.forEach(e=>{
 
@@ -2595,10 +2595,11 @@ Object.entries(datosDeposito)
     !== anioActivo
 ) return;
 
-        if(
-            String(e.deposito) === deposito &&
-            String(e.vuelta) === vuelta
-        ){
+       if(
+    Number(e.anio || 2025) === Number(anio) &&
+    String(e.deposito) === deposito &&
+    String(e.vuelta) === vuelta
+){
 
             kgDescubados +=
             Number(e.kgNeto || 0);
