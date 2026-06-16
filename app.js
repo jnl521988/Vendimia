@@ -25,6 +25,7 @@ Number(
     localStorage.getItem("anioActivo")
 ) || new Date().getFullYear();
 
+
 // =======================================
 // NAVEGACIÓN
 // =======================================
@@ -77,6 +78,256 @@ function exportarPDF(){
 
     const pagina =
     document.querySelector(".page.active");
+
+    // =====================================
+// VITICULTORES
+// =====================================
+
+if (pagina.id === "page-viticultores") {
+
+    if (viticultores.length === 0) {
+
+        alert("No hay viticultores registrados");
+        return;
+
+    }
+
+    const lista = viticultores
+        .map((v, i) => `${i + 1} - ${v.nombre}`)
+        .join("\n");
+
+    const seleccion = prompt(
+        `Seleccione el número del viticultor:\n\n${lista}`
+    );
+
+    if (seleccion === null) return;
+
+    const indice = Number(seleccion) - 1;
+
+    if (
+        isNaN(indice) ||
+        indice < 0 ||
+        indice >= viticultores.length
+    ) {
+
+        alert("Selección no válida");
+        return;
+
+    }
+
+    exportarViticultorPDF(indice);
+
+    return;
+}
+
+function exportarViticultorPDF(indice) {
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF("portrait");
+
+    const vit = viticultores[indice];
+
+    // =====================================
+    // CABECERA
+    // =====================================
+
+    doc.setFontSize(18);
+
+    doc.text(
+        vit.nombre,
+        14,
+        18
+    );
+
+    doc.setFontSize(11);
+
+    doc.text(
+        `Observaciones / Teléfono: ${vit.detalle || "-"}`,
+        14,
+        26
+    );
+
+    doc.text(
+        `Total hectáreas: ${Number(vit.totalHectareas || 0).toFixed(2)}`,
+        14,
+        33
+    );
+
+    let posicionY = 42;
+
+    // =====================================
+    // HISTORIAL DE CAMPAÑAS
+    // =====================================
+
+    const historialAutomatico = {};
+
+    vit.titulares.forEach(titular => {
+
+        entradas.forEach(e => {
+
+            if (e.titular !== titular.nombre) return;
+
+            const anio = Number(e.anio || 2025);
+
+            if (!historialAutomatico[anio]) {
+
+                historialAutomatico[anio] = 0;
+
+            }
+
+            historialAutomatico[anio] += Number(e.kgNeto || 0);
+
+        });
+
+    });
+
+    const historial = [];
+
+    (vit.historial || []).forEach(h => {
+
+        historial.push([
+            "Manual",
+            h.anio,
+            Number(h.kg || 0).toFixed(0)
+        ]);
+
+    });
+
+    Object.entries(historialAutomatico).forEach(([anio, kg]) => {
+
+        historial.push([
+            "Automático",
+            anio,
+            Number(kg).toFixed(0)
+        ]);
+
+    });
+
+    historial.sort((a, b) => Number(a[1]) - Number(b[1]));
+
+    doc.setFontSize(14);
+
+    doc.text(
+        "Historial de Campañas",
+        14,
+        posicionY
+    );
+
+    doc.autoTable({
+
+        startY: posicionY + 5,
+
+        head: [[
+            "Tipo",
+            "Año",
+            "Kg Uva"
+        ]],
+
+        body: historial,
+
+        theme: "grid",
+
+        headStyles: {
+            fillColor: [210, 140, 135]
+        },
+
+        styles: {
+            fontSize: 9
+        }
+
+    });
+
+    posicionY = doc.lastAutoTable.finalY + 15;
+
+    // =====================================
+    // TITULARES Y VIÑAS
+    // =====================================
+
+    vit.titulares.forEach((titular, index) => {
+
+        if (posicionY > 230) {
+
+            doc.addPage();
+            posicionY = 20;
+
+        }
+
+        doc.setFontSize(13);
+
+        doc.text(
+            `Titular: ${titular.nombre}`,
+            14,
+            posicionY
+        );
+
+        doc.setFontSize(10);
+
+        doc.text(
+            `DNI / CIF: ${titular.dni || "-"}`,
+            14,
+            posicionY + 7
+        );
+
+        posicionY += 14;
+
+        const filasVinas = titular.vinas.map(vina => [
+
+            vina.municipio || "",
+            vina.poligono || "",
+            vina.parcela || "",
+            vina.recinto || "",
+            vina.paraje || "",
+            vina.variedad || "",
+            Number(vina.hectareas || 0).toFixed(2),
+            Number(vina.kgHa || 0).toFixed(0),
+            Number(vina.rendimiento || 0).toFixed(0),
+            vina.vendimia || "",
+            vina.anio || ""
+
+        ]);
+
+        doc.autoTable({
+
+            startY: posicionY,
+
+            head: [[
+                "Municipio",
+                "Pol.",
+                "Parc.",
+                "Rec.",
+                "Paraje",
+                "Variedad",
+                "Ha",
+                "Kg/Ha",
+                "Rto.",
+                "Vendimia",
+                "Año"
+            ]],
+
+            body: filasVinas,
+
+            theme: "grid",
+
+            headStyles: {
+                fillColor: [210, 140, 135]
+            },
+
+            styles: {
+                fontSize: 7
+            }
+
+        });
+
+        posicionY = doc.lastAutoTable.finalY + 12;
+
+    });
+
+    doc.save(
+        `Viticultor_${vit.nombre}.pdf`
+    );
+
+}
 
     // =====================================
     // ENTRADAS DE UVA
