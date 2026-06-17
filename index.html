@@ -34,6 +34,20 @@
             <button id="pdfBtn" class="secondary">
                 Exportar PDF
             </button>
+
+               <button id="exportJsonBtn" class="btn-export-json">
+            Exportar JSON
+        </button>
+
+        <button id="importJsonBtn" class="btn-import-json">
+            Importar JSON
+        </button>
+
+        <input
+            type="file"
+            id="importJsonInput"
+            accept=".json"
+            style="display:none;">
         </div>
     </header>
 
@@ -409,6 +423,275 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- MODAL TITULAR -->
+
+<div id="modalTitular" class="modal-overlay">
+
+    <div class="modal-box">
+
+        <h3 id="tituloModalTitular">
+            NUEVO TITULAR
+        </h3>
+
+        <div class="form-grid">
+
+            <div>
+                <label>Nombre</label>
+                <input type="text" id="modalTitularNombre">
+            </div>
+
+            <div>
+                <label>DNI / CIF</label>
+                <input type="text" id="modalTitularDni">
+            </div>
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button
+            class="secondary"
+            onclick="cerrarModalTitular()">
+                Cancelar
+            </button>
+
+            <button
+            class="primary"
+            onclick="guardarTitular()">
+                Guardar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL VIÑA -->
+
+<div id="modalVina" class="modal-overlay">
+
+    <div class="modal-box modal-vina">
+
+        <h3 id="tituloModalVina">
+            NUEVA VIÑA
+        </h3>
+
+        <div class="form-grid">
+
+            <div>
+                <label>Municipio</label>
+                <select id="vinaMunicipio">
+
+                    <option value="">Seleccione</option>
+
+                    <option>Toro</option>
+                    <option>Morales de Toro</option>
+                    <option>Villabuena del Puente</option>
+                    <option>Valdefinjas</option>
+                    <option>Argujillo</option>
+                    <option>Venialbo</option>
+                    <option>La Bóveda de Toro</option>
+                    <option>Peleagonzalo</option>
+                    <option>El Pego</option>
+                    <option>Sanzoles</option>
+                    <option>Pedrosa del Rey</option>
+                    <option>Villaester</option>
+                    <option>San Román de Hornija</option>
+                    <option>Villafranca de Duero</option>
+
+                </select>
+
+            </div>
+
+            <div>
+                <label>Polígono</label>
+                <input type="text" id="vinaPoligono">
+            </div>
+
+            <div>
+                <label>Parcela</label>
+                <input type="text" id="vinaParcela">
+            </div>
+
+            <div>
+                <label>Recinto</label>
+                <input type="text" id="vinaRecinto">
+            </div>
+
+            <div>
+                <label>Paraje</label>
+                <input type="text" id="vinaParaje">
+            </div>
+
+            <div>
+                <label>Variedad</label>
+
+                <select id="vinaVariedad">
+
+                    <option value="">Seleccione</option>
+
+                    <option>Tinta de Toro</option>
+                    <option>Garnacha</option>
+                    <option>Petit Verdot</option>
+                    <option>Cabernet Sauvignon</option>
+                    <option>Syrah</option>
+                    <option>Merlot</option>
+                    <option>Malvasía Aromática</option>
+                    <option>Chardonnay</option>
+                    <option>Verdejo</option>
+                    <option>Malvasía Castellana</option>
+                    <option>Albillo Real</option>
+                    <option>Moscatel</option>
+                    <option>Palomino</option>
+                    <option>Godello</option>
+
+                </select>
+
+            </div>
+
+            <div>
+                <label>Hectáreas</label>
+                <input type="number" step="0.01" id="vinaHectareas">
+            </div>
+
+            <div>
+                <label>Kg/Ha Máximo</label>
+                <input type="number" id="vinaKgHa">
+            </div>
+
+            <div>
+                <label>Vendimia</label>
+
+                <select id="vinaVendimia">
+                    <option value="">Seleccione</option>
+                    <option>Mano</option>
+                    <option>Máquina</option>
+                </select>
+
+            </div>
+
+            <div>
+                <label>Año Viñedo</label>
+                <input type="number" id="vinaAnio">
+            </div>
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button
+            class="secondary"
+            onclick="cerrarModalVina()">
+                Cancelar
+            </button>
+
+            <button
+            class="primary"
+            onclick="guardarVina()">
+                Guardar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="modalCampania" class="modal-overlay">
+
+    <div class="modal-box">
+
+        <h3 id="tituloModalCampania">
+            NUEVA CAMPAÑA
+        </h3>
+
+        <div class="form-grid">
+
+            <div>
+                <label>Año</label>
+
+                <input
+                    type="number"
+                    id="campaniaAnio">
+            </div>
+
+            <div>
+                <label>Kgs de uva</label>
+
+                <input
+                    type="number"
+                    id="campaniaKg">
+            </div>
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button
+                class="secondary"
+                onclick="cerrarModalCampania()">
+                Cancelar
+            </button>
+
+            <button
+                class="primary"
+                onclick="guardarCampania()">
+                Guardar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="modalViticultor" class="modal-overlay">
+
+    <div class="modal-box">
+
+        <h3>EDITAR VITICULTOR</h3>
+
+        <div class="form-grid">
+
+            <div>
+                <label>Viticultor</label>
+
+                <input
+                    type="text"
+                    id="editVitNombre">
+            </div>
+
+            <div>
+                <label>Observaciones / Teléfono</label>
+
+                <input
+                    type="text"
+                    id="editVitDetalle">
+            </div>
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button
+                class="secondary"
+                onclick="cerrarModalViticultor()">
+                Cancelar
+            </button>
+
+            <button
+                class="primary"
+                onclick="guardarViticultor()">
+                Guardar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 </body>
 </html>

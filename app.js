@@ -25,6 +25,11 @@ Number(
     localStorage.getItem("anioActivo")
 ) || new Date().getFullYear();
 
+let modalVitIndex = null;
+let modalTitIndex = null;
+let modalVinaIndex = null;
+let viticultorEditando = null;
+
 
 // =======================================
 // NAVEGACIÓN
@@ -1302,41 +1307,58 @@ function(vitIndex,titIndex){
 // AÑADIR AÑO
 // =======================================
 
+let viticultorCampania = null;
+
 window.agregarAnio = function(index){
 
-   const anio =
-prompt("Año");
+    viticultorCampania = index;
 
-if(!anio) return;
+    document.getElementById("campaniaAnio").value =
+        anioActivo;
 
-const kg =
-prompt("Kg de uva","0");
+    document.getElementById("campaniaKg").value =
+        0;
 
-viticultores[index]
-.historial
-.push({
+    document
+        .getElementById("modalCampania")
+        .classList.add("show");
 
-    anio,
+};
 
-    kg:Number(kg)||0
+function cerrarModalCampania(){
 
-});
+    document
+        .getElementById("modalCampania")
+        .classList.remove("show");
 
-renderViticultores();
-guardarDatos();
+}
 
-setTimeout(()=>{
+function guardarCampania(){
 
-    const fila =
-    document.getElementById(
-    `historial-${index}`
+    const anio = Number(
+        document.getElementById("campaniaAnio").value
     );
 
-    if(fila)
-        fila.style.display =
-        "table-row";
+    const kg = Number(
+        document.getElementById("campaniaKg").value
+    );
 
-},10);}
+    if(!anio) return;
+
+    viticultores[viticultorCampania]
+        .historial.push({
+
+            anio,
+            kg
+
+        });
+
+    renderViticultores();
+    guardarDatos();
+
+    cerrarModalCampania();
+
+}
 
 // =======================================
 // ACTUALIZAR KG
@@ -1376,34 +1398,65 @@ function(vitIndex,anioIndex){
 // EDITAR
 // =======================================
 
-window.editarViticultor =
-function(index){
+window.editarViticultor = function(index){
 
-    const vit =
-    viticultores[index];
+    const vit = viticultores[index];
 
-    const nuevoNombre =
-    prompt(
-        "Nombre",
-        vit.nombre
-    );
+    viticultorEditando = index;
 
-    if(nuevoNombre === null)
-        return;
+    document.getElementById(
+        "editVitNombre"
+    ).value = vit.nombre || "";
 
-    const nuevoDetalle =
-    prompt(
-        "Detalle",
-        vit.detalle
-    );
+    document.getElementById(
+        "editVitDetalle"
+    ).value = vit.detalle || "";
 
-    vit.nombre = nuevoNombre;
-    vit.detalle = nuevoDetalle;
-
-    renderViticultores();
-    guardarDatos();
+    document
+        .getElementById("modalViticultor")
+        .classList.add("show");
 
 };
+
+function cerrarModalViticultor(){
+
+    document
+        .getElementById("modalViticultor")
+        .classList.remove("show");
+
+}
+
+function guardarViticultor(){
+
+    const nombre =
+    document.getElementById(
+        "editVitNombre"
+    ).value.trim();
+
+    const detalle =
+    document.getElementById(
+        "editVitDetalle"
+    ).value.trim();
+
+    if(!nombre){
+
+        alert("Debe indicar el nombre");
+
+        return;
+    }
+
+    viticultores[viticultorEditando].nombre =
+    nombre;
+
+    viticultores[viticultorEditando].detalle =
+    detalle;
+
+    guardarDatos();
+    renderViticultores();
+
+    cerrarModalViticultor();
+
+}
 
 // =======================================
 // ELIMINAR
@@ -1432,60 +1485,53 @@ function(index){
 
 renderViticultores();
 
-window.agregarTitular =
-function(vitIndex){
+window.agregarTitular = function(vitIndex){
 
-    const nombre =
-    prompt("Nombre del titular");
+    modalVitIndex = vitIndex;
+    modalTitIndex = null;
 
-    if(!nombre) return;
+    document.getElementById(
+        "tituloModalTitular"
+    ).textContent = "NUEVO TITULAR";
 
-    const dni =
-    prompt("DNI / CIF");
+    document.getElementById(
+        "modalTitularNombre"
+    ).value = "";
 
-    viticultores[vitIndex]
-    .titulares
-    .push({
+    document.getElementById(
+        "modalTitularDni"
+    ).value = "";
 
-        nombre,
-        dni,
-
-        vinas:[],
-mostrarVinas:false
-
-    });
-
-    renderViticultores();
-    guardarDatos();
+    document.getElementById(
+        "modalTitular"
+    ).classList.add("show");
 
 };
 
-window.editarTitular =
-function(vitIndex,titIndex){
+window.editarTitular = function(vitIndex,titIndex){
 
     const titular =
     viticultores[vitIndex]
     .titulares[titIndex];
 
-    const nombre =
-    prompt(
-        "Nombre",
-        titular.nombre
-    );
+    modalVitIndex = vitIndex;
+    modalTitIndex = titIndex;
 
-    if(nombre===null) return;
+    document.getElementById(
+        "tituloModalTitular"
+    ).textContent = "EDITAR TITULAR";
 
-    const dni =
-    prompt(
-        "DNI / CIF",
-        titular.dni
-    );
+    document.getElementById(
+        "modalTitularNombre"
+    ).value = titular.nombre;
 
-    titular.nombre = nombre;
-    titular.dni = dni;
+    document.getElementById(
+        "modalTitularDni"
+    ).value = titular.dni;
 
-    renderViticultores();
-    guardarDatos();
+    document.getElementById(
+        "modalTitular"
+    ).classList.add("show");
 
 };
 
@@ -1510,65 +1556,21 @@ function(vitIndex,titIndex){
 
 };
 
-window.agregarVina =
-function(vitIndex,titIndex){
+window.agregarVina = function(vitIndex,titIndex){
 
-    const municipio = prompt("Municipio");
-    if(!municipio) return;
+    modalVitIndex = vitIndex;
+    modalTitIndex = titIndex;
+    modalVinaIndex = null;
 
-    const poligono = prompt("Polígono");
-    const parcela = prompt("Parcela");
-    const recinto = prompt("Recinto");
-    const paraje = prompt("Paraje");
+    document.getElementById(
+        "tituloModalVina"
+    ).textContent = "NUEVA VIÑA";
 
-    const variedad = prompt(
-        "Variedad de uva"
-    );
+    limpiarFormularioVina();
 
-    const hectareas =
-    Number(prompt("Hectáreas"));
-
-    const kgHa =
-    Number(prompt("Kg Hectárea Máximo"));
-
-    const vendimia =
-    prompt("Mano o Máquina");
-
-    const anio =
-    prompt("Año Viñedo");
-
-    const rendimiento =
-    hectareas * kgHa;
-
-    viticultores[vitIndex]
-    .titulares[titIndex]
-    .vinas
-    .push({
-
-        municipio,
-        poligono,
-        parcela,
-        recinto,
-        paraje,
-
-        variedad,
-
-        hectareas,
-
-        kgHa,
-
-        rendimiento,
-
-        vendimia,
-
-        anio
-
-    });
-
-    recalcularHectareas(vitIndex);
-
-    renderViticultores();
-    guardarDatos();
+    document
+    .getElementById("modalVina")
+    .classList.add("show");
 
 };
 
@@ -1603,77 +1605,28 @@ function(vitIndex,titIndex,vinaIndex){
     .titulares[titIndex]
     .vinas[vinaIndex];
 
-    vina.municipio =
-    prompt(
-        "Municipio",
-        vina.municipio
-    );
+    modalVitIndex = vitIndex;
+    modalTitIndex = titIndex;
+    modalVinaIndex = vinaIndex;
 
-    vina.poligono =
-    prompt(
-        "Polígono",
-        vina.poligono
-    );
+    document.getElementById(
+        "tituloModalVina"
+    ).textContent = "EDITAR VIÑA";
 
-    vina.parcela =
-    prompt(
-        "Parcela",
-        vina.parcela
-    );
+    document.getElementById("vinaMunicipio").value = vina.municipio || "";
+    document.getElementById("vinaPoligono").value = vina.poligono || "";
+    document.getElementById("vinaParcela").value = vina.parcela || "";
+    document.getElementById("vinaRecinto").value = vina.recinto || "";
+    document.getElementById("vinaParaje").value = vina.paraje || "";
+    document.getElementById("vinaVariedad").value = vina.variedad || "";
+    document.getElementById("vinaHectareas").value = vina.hectareas || "";
+    document.getElementById("vinaKgHa").value = vina.kgHa || "";
+    document.getElementById("vinaVendimia").value = vina.vendimia || "";
+    document.getElementById("vinaAnio").value = vina.anio || "";
 
-    vina.recinto =
-    prompt(
-        "Recinto",
-        vina.recinto
-    );
-
-    vina.paraje =
-    prompt(
-        "Paraje",
-        vina.paraje
-    );
-
-    vina.variedad =
-    prompt(
-        "Variedad",
-        vina.variedad
-    );
-
-    vina.hectareas =
-    Number(
-        prompt(
-            "Hectáreas",
-            vina.hectareas
-        )
-    );
-
-    vina.kgHa =
-    Number(
-        prompt(
-            "Kg/Ha",
-            vina.kgHa
-        )
-    );
-
-    vina.vendimia =
-    prompt(
-        "Vendimia",
-        vina.vendimia
-    );
-
-    vina.anio =
-    prompt(
-        "Año",
-        vina.anio
-    );
-
-    vina.rendimiento =
-    vina.hectareas * vina.kgHa;
-
-    recalcularHectareas(vitIndex);
-
-    renderViticultores();
-    guardarDatos();
+    document
+    .getElementById("modalVina")
+    .classList.add("show");
 
 };
 
@@ -1702,6 +1655,173 @@ function(vitIndex,titIndex,vinaIndex){
     renderDepositos();
 
 };
+
+function cerrarModalTitular(){
+
+    document
+    .getElementById("modalTitular")
+    .classList.remove("show");
+
+}
+
+function guardarTitular(){
+
+    const nombre =
+    document.getElementById(
+        "modalTitularNombre"
+    ).value.trim();
+
+    const dni =
+    document.getElementById(
+        "modalTitularDni"
+    ).value.trim();
+
+    if(!nombre) return;
+
+    if(modalTitIndex === null){
+
+        viticultores[modalVitIndex]
+        .titulares.push({
+
+            nombre,
+            dni,
+
+            vinas:[],
+
+            mostrarVinas:false
+
+        });
+
+    }else{
+
+        const titular =
+        viticultores[modalVitIndex]
+        .titulares[modalTitIndex];
+
+        titular.nombre = nombre;
+        titular.dni = dni;
+
+    }
+
+    cerrarModalTitular();
+
+    renderViticultores();
+    guardarDatos();
+
+}
+
+function limpiarFormularioVina(){
+
+    document.getElementById("vinaMunicipio").value = "";
+    document.getElementById("vinaPoligono").value = "";
+    document.getElementById("vinaParcela").value = "";
+    document.getElementById("vinaRecinto").value = "";
+    document.getElementById("vinaParaje").value = "";
+    document.getElementById("vinaVariedad").value = "";
+    document.getElementById("vinaHectareas").value = "";
+    document.getElementById("vinaKgHa").value = "";
+    document.getElementById("vinaVendimia").value = "";
+    document.getElementById("vinaAnio").value = "";
+
+}
+
+function cerrarModalVina(){
+
+    document
+    .getElementById("modalVina")
+    .classList.remove("show");
+
+}
+
+function guardarVina(){
+
+    const hectareas =
+    Number(
+        document.getElementById(
+            "vinaHectareas"
+        ).value || 0
+    );
+
+    const kgHa =
+    Number(
+        document.getElementById(
+            "vinaKgHa"
+        ).value || 0
+    );
+
+    const datos = {
+
+        municipio:
+        document.getElementById(
+            "vinaMunicipio"
+        ).value,
+
+        poligono:
+        document.getElementById(
+            "vinaPoligono"
+        ).value,
+
+        parcela:
+        document.getElementById(
+            "vinaParcela"
+        ).value,
+
+        recinto:
+        document.getElementById(
+            "vinaRecinto"
+        ).value,
+
+        paraje:
+        document.getElementById(
+            "vinaParaje"
+        ).value,
+
+        variedad:
+        document.getElementById(
+            "vinaVariedad"
+        ).value,
+
+        hectareas,
+
+        kgHa,
+
+        rendimiento:
+        hectareas * kgHa,
+
+        vendimia:
+        document.getElementById(
+            "vinaVendimia"
+        ).value,
+
+        anio:
+        document.getElementById(
+            "vinaAnio"
+        ).value
+
+    };
+
+    if(modalVinaIndex === null){
+
+        viticultores[modalVitIndex]
+        .titulares[modalTitIndex]
+        .vinas.push(datos);
+
+    }else{
+
+        viticultores[modalVitIndex]
+        .titulares[modalTitIndex]
+        .vinas[modalVinaIndex] = datos;
+
+    }
+
+    recalcularHectareas(modalVitIndex);
+
+    cerrarModalVina();
+
+    renderViticultores();
+    guardarDatos();
+
+}
 
 // =======================================
 // TABLA ENTRADAS
@@ -3508,3 +3628,142 @@ document
 
 });
 
+document
+.getElementById("exportJsonBtn")
+.addEventListener("click", exportarJSON);
+
+function exportarJSON(){
+
+    const datos = {
+
+        viticultores,
+        entradas,
+        datosDeposito,
+        lias,
+        hollejos,
+        anioActivo
+
+    };
+
+    const contenido =
+    JSON.stringify(datos, null, 2);
+
+    const blob = new Blob(
+        [contenido],
+        { type:"application/json" }
+    );
+
+    const url =
+    URL.createObjectURL(blob);
+
+    const enlace =
+    document.createElement("a");
+
+    const fecha =
+    new Date().toISOString().slice(0,10);
+
+    enlace.href = url;
+
+    enlace.download =
+    `Vendimia_${fecha}.json`;
+
+    enlace.click();
+
+    URL.revokeObjectURL(url);
+
+}
+
+document
+.getElementById("importJsonBtn")
+.addEventListener("click",()=>{
+
+    document
+    .getElementById("importJsonInput")
+    .click();
+
+});
+
+document
+.getElementById("importJsonInput")
+.addEventListener("change", importarJSON);
+
+function importarJSON(event){
+
+    const archivo =
+    event.target.files[0];
+
+    if(!archivo) return;
+
+    const lector = new FileReader();
+
+    lector.onload = function(e){
+
+        try{
+
+            const datos =
+            JSON.parse(e.target.result);
+
+            if(
+                !confirm(
+                    "Se sustituirán todos los datos actuales. ¿Continuar?"
+                )
+            ){
+                return;
+            }
+
+            viticultores =
+            datos.viticultores || [];
+
+            entradas =
+            datos.entradas || [];
+
+            datosDeposito =
+            datos.datosDeposito || {};
+
+            lias =
+            datos.lias || [];
+
+            hollejos =
+            datos.hollejos || [];
+
+            anioActivo =
+            datos.anioActivo ||
+            new Date().getFullYear();
+
+            guardarDatos();
+
+            localStorage.setItem(
+                "anioActivo",
+                anioActivo
+            );
+
+            document
+            .getElementById("anioActual")
+            .textContent = anioActivo;
+
+            renderViticultores();
+            renderEntradas();
+            renderDepositos();
+            renderTotalesLitros();
+            renderLias();
+            renderHollejos();
+
+            alert(
+                "Datos importados correctamente"
+            );
+
+        }catch(error){
+
+            alert(
+                "El archivo JSON no es válido"
+            );
+
+        }
+
+        event.target.value = "";
+
+    };
+
+    lector.readAsText(archivo);
+
+}

@@ -667,3 +667,167 @@ table td{
     font-size: 12px;
     color: #0e0e0e;
 }
+
+.modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    z-index:1000;
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-overlay.show{
+    display:flex;
+}
+
+.modal-box{
+    background:#93b9cd;
+    padding:25px;
+    border-radius:10px;
+    border:3px solid #b22222;
+    box-shadow:0 0 15px rgba(178,34,34,.25);
+    width:90%;
+    max-width:700px;
+    max-height:90vh;
+    overflow-y:auto;
+}
+
+.modal-vina{
+    max-width:900px;
+}
+
+.modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:20px;
+}
+
+/* EXPORTAR JSON */
+
+.btn-export-json{
+    background:#ca3b3b;
+    color:#fff;
+    border:none;
+}
+
+.btn-export-json:hover{
+    background:#8c2121;
+}
+
+/* IMPORTAR JSON */
+
+.btn-import-json{
+    background:#27ae9a;
+    color:#fff;
+    border:none;
+}
+
+.btn-import-json:hover{
+    background:#1e8484;
+}
+
+/* ===================================== */
+/* MÓVILES */
+/* ===================================== */
+
+@media (max-width: 768px){
+
+    body{
+        font-size:14px;
+    }
+
+    /* CABECERA */
+
+    .topbar{
+        flex-direction:column;
+        gap:12px;
+        padding:15px;
+    }
+
+    .nav-buttons{
+        width:100%;
+        display:flex;
+        flex-wrap:wrap;
+        justify-content:center;
+        gap:8px;
+    }
+
+    .nav-btn{
+        flex:1 1 calc(50% - 8px);
+        min-width:140px;
+    }
+
+    /* FORMULARIOS */
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    /* BOTONES */
+
+    button{
+        width:100%;
+    }
+
+    .modal-actions{
+        flex-direction:column;
+    }
+
+    /* MODALES */
+
+    .modal-box{
+        width:95vw;
+        max-width:none;
+        max-height:90vh;
+        margin:10px;
+        padding:20px;
+        border-radius:12px;
+    }
+
+    .modal-vina{
+        width:95vw;
+        max-width:none;
+    }
+
+    /* TABLAS */
+
+    table{
+        display:block;
+        width:100%;
+        overflow-x:auto;
+        white-space:nowrap;
+    }
+
+    .subtable{
+        display:block;
+        overflow-x:auto;
+        white-space:nowrap;
+    }
+
+    /* HISTORIAL */
+
+    .historial-box{
+        overflow-x:auto;
+    }
+
+    /* TOOLBARS */
+
+    .toolbar-entradas,
+    .depositos-toolbar{
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+    }
+
+    /* SELECTOR DE CAMPAÑA */
+
+    .selector-campania{
+        justify-content:center;
+        gap:15px;
+        flex-wrap:wrap;
+    }
+
+}
