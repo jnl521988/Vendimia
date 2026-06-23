@@ -1271,6 +1271,52 @@ tit.mostrarVinas
         vitTableBody.appendChild(histRow);
 
     });
+    renderResumenViticultores();
+
+}
+
+function renderResumenViticultores(){
+
+    let totalHectareas = 0;
+    let totalTitulares = 0;
+    let totalVinas = 0;
+
+    viticultores.forEach(vit=>{
+
+        totalHectareas +=
+        Number(vit.totalHectareas || 0);
+
+        totalTitulares +=
+        vit.titulares.length;
+
+        vit.titulares.forEach(tit=>{
+
+            totalVinas +=
+            tit.vinas.length;
+
+        });
+
+    });
+
+    document.getElementById(
+        "totalHectareasGeneral"
+    ).textContent =
+    totalHectareas.toFixed(2);
+
+    document.getElementById(
+        "totalViticultores"
+    ).textContent =
+    viticultores.length;
+
+    document.getElementById(
+        "totalTitulares"
+    ).textContent =
+    totalTitulares;
+
+    document.getElementById(
+        "totalVinas"
+    ).textContent =
+    totalVinas;
 
 }
 
