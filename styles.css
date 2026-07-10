@@ -892,3 +892,22 @@ body{
     color:#8b1e1e;
     margin-left:5px;
 }
+
+.topbar{
+    position: relative;
+}
+
+.logo-img{
+    position: absolute;
+
+    left: 15px;      /* Distancia al borde izquierdo */
+    top: 15px;       /* Distancia al borde superior */
+
+    width: 80px;     /* Ajusta el tamaño */
+    height: auto;
+    border-radius:10px;
+}
+
+.logo{
+    text-align: center;
+}
