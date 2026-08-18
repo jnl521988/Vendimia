@@ -20,6 +20,22 @@ JSON.parse(
 localStorage.getItem("datosDeposito")
 ) || {};
 
+// =======================================
+// TRAZABILIDAD PRODUCTOS
+// =======================================
+
+let trazabilidad =
+JSON.parse(
+    localStorage.getItem("trazabilidad")
+) || [];
+
+let productosTrazabilidad =
+JSON.parse(
+    localStorage.getItem("productosTrazabilidad")
+) || [];
+
+let depositoTrazabilidadActivo = null;
+
 let anioActivo =
 Number(
     localStorage.getItem("anioActivo")
@@ -2394,6 +2410,16 @@ function guardarDatos(){
         JSON.stringify(hollejos)
     );
 
+        localStorage.setItem(
+        "trazabilidad",
+        JSON.stringify(trazabilidad)
+    );
+
+    localStorage.setItem(
+        "productosTrazabilidad",
+        JSON.stringify(productosTrazabilidad)
+    );
+
 }
 
     // =======================================
@@ -3813,3 +3839,1305 @@ function importarJSON(event){
     lector.readAsText(archivo);
 
 }
+
+// =====================================================
+// TRAZABILIDAD PRODUCTOS
+// =====================================================
+
+const listaDepositosTrazabilidad =
+document.getElementById(
+    "listaDepositosTrazabilidad"
+);
+
+const trazabilidadContenido =
+document.getElementById(
+    "trazabilidadContenido"
+);
+
+
+// =====================================================
+// MODALES
+// =====================================================
+
+const modalDepositoTrazabilidad =
+document.getElementById(
+    "modalDepositoTrazabilidad"
+);
+
+const modalProductoTrazabilidad =
+document.getElementById(
+    "modalProductoTrazabilidad"
+);
+
+let indiceDepositoTrazabilidadEditando = null;
+
+let indiceProductoTrazabilidadEditando = null;
+
+
+// =====================================================
+// ABRIR MODAL NUEVO DEPÓSITO
+// =====================================================
+
+document
+.getElementById(
+    "btnNuevoDepositoTrazabilidad"
+)
+.addEventListener("click",()=>{
+
+    indiceDepositoTrazabilidadEditando = null;
+
+    document.getElementById(
+        "tituloModalDepositoTrazabilidad"
+    ).textContent = "NUEVO DEPÓSITO";
+
+    document.getElementById(
+        "trazDeposito"
+    ).value = "";
+
+    document.getElementById(
+        "trazVuelta"
+    ).value = "1";
+
+    document.getElementById(
+        "trazFechaEncubado"
+    ).value = "";
+
+    document.getElementById(
+        "trazKgUva"
+    ).value = "";
+
+    document.getElementById(
+        "trazVariedad"
+    ).value = "";
+
+    modalDepositoTrazabilidad
+    .classList.add("show");
+
+});
+
+
+// =====================================================
+// CANCELAR DEPÓSITO
+// =====================================================
+
+document
+.getElementById(
+    "cancelarDepositoTrazabilidad"
+)
+.addEventListener("click",()=>{
+
+    modalDepositoTrazabilidad
+    .classList.remove("show");
+
+});
+
+
+// =====================================================
+// GUARDAR DEPÓSITO
+// =====================================================
+
+document
+.getElementById(
+    "guardarDepositoTrazabilidad"
+)
+.addEventListener("click",()=>{
+
+    const deposito =
+    document.getElementById(
+        "trazDeposito"
+    ).value.trim();
+
+    const vuelta =
+    Number(
+        document.getElementById(
+            "trazVuelta"
+        ).value
+    );
+
+    const fechaEncubado =
+    document.getElementById(
+        "trazFechaEncubado"
+    ).value;
+
+    const kgUva =
+    Number(
+        document.getElementById(
+            "trazKgUva"
+        ).value
+    ) || 0;
+
+    const variedad =
+    document.getElementById(
+        "trazVariedad"
+    ).value.trim();
+
+    const gradoPrevisto =
+Number(
+    document.getElementById("trazGradoPrevisto").value
+) || 0;
+
+
+    if(!deposito){
+
+        alert(
+            "Debe indicar el depósito."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        !vuelta ||
+        vuelta < 1 ||
+        vuelta > 4
+    ){
+
+        alert(
+            "La vuelta debe estar entre 1 y 4."
+        );
+
+        return;
+
+    }
+
+
+    if(!fechaEncubado){
+
+        alert(
+            "Debe indicar la fecha de encubado."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        indiceDepositoTrazabilidadEditando === null
+    ){
+
+        const existe =
+        trazabilidad.some(t=>
+            String(t.deposito) === String(deposito) &&
+            Number(t.vuelta) === Number(vuelta)
+        );
+
+        if(existe){
+
+            alert(
+                "Ese depósito y vuelta ya existen."
+            );
+
+            return;
+
+        }
+
+
+        trazabilidad.push({
+
+            id:Date.now(),
+
+            deposito,
+            vuelta,
+
+            fechaEncubado,
+
+            kgUva,
+
+            variedad,
+
+            gradoPrevisto,
+
+            seguimiento:[]
+
+        });
+
+    }else{
+
+        const datos =
+        trazabilidad[
+            indiceDepositoTrazabilidadEditando
+        ];
+
+        datos.deposito = deposito;
+        datos.vuelta = vuelta;
+        datos.fechaEncubado = fechaEncubado;
+        datos.kgUva = kgUva;
+        datos.variedad = variedad;
+        datos.gradoPrevisto = gradoPrevisto;
+
+    }
+
+
+    guardarDatos();
+
+    modalDepositoTrazabilidad
+    .classList.remove("show");
+
+    renderTrazabilidad();
+
+});
+
+// =====================================================
+// RENDER DEPOSITOS
+// =====================================================
+
+function renderTrazabilidad(){
+
+    listaDepositosTrazabilidad.innerHTML = "";
+
+    if(
+        trazabilidad.length === 0
+    ){
+
+        depositoTrazabilidadActivo = null;
+
+        trazabilidadContenido.innerHTML = `
+
+            <div class="trazabilidad-vacio">
+
+                <h3>TRAZABILIDAD DE PRODUCTOS</h3>
+
+                <p>
+                    Todavía no hay depósitos creados.
+                </p>
+
+                <p>
+                    Pulse "+ Nuevo Depósito"
+                    para comenzar.
+                </p>
+
+            </div>
+
+        `;
+
+    }else{
+
+        trazabilidad.forEach(
+            (deposito,index)=>{
+
+                const boton =
+                document.createElement("button");
+
+                boton.className =
+                "btn-deposito-trazabilidad";
+
+                if(
+                    index ===
+                    depositoTrazabilidadActivo
+                ){
+
+                    boton.classList.add(
+                        "activo"
+                    );
+
+                }
+
+                boton.textContent =
+                `${deposito.deposito}/${deposito.vuelta}`;
+
+                boton.onclick = ()=>{
+
+                    depositoTrazabilidadActivo =
+                    index;
+
+                    renderTrazabilidad();
+
+                };
+
+                listaDepositosTrazabilidad
+                .appendChild(boton);
+
+            }
+        );
+
+
+        if(
+            depositoTrazabilidadActivo === null ||
+            !trazabilidad[
+                depositoTrazabilidadActivo
+            ]
+        ){
+
+            depositoTrazabilidadActivo = 0;
+
+        }
+
+        renderDepositoTrazabilidadActivo();
+
+    }
+
+
+    renderProductosTrazabilidad();
+
+}
+
+// =====================================================
+// MOSTRAR DEPÓSITO ACTIVO
+// =====================================================
+
+function renderDepositoTrazabilidadActivo(){
+
+    const deposito =
+    trazabilidad[
+        depositoTrazabilidadActivo
+    ];
+
+    if(!deposito) return;
+
+
+    trazabilidadContenido.innerHTML = `
+
+        <div class="trazabilidad-card">
+
+            <div class="trazabilidad-card-header">
+
+                <div>
+
+                    <h3 class="trazabilidad-titulo">
+
+                        DEPÓSITO
+                        ${deposito.deposito}
+                        /
+                        ${deposito.vuelta}
+
+                    </h3>
+
+                </div>
+
+
+                <div class="trazabilidad-acciones">
+
+                    <button
+                    class="btn-editar-traz"
+                    onclick="
+                    editarDepositoTrazabilidad(
+                        ${depositoTrazabilidadActivo}
+                    )">
+
+                        Editar Depósito
+
+                    </button>
+
+
+                    <button
+                    class="btn-eliminar-traz"
+                    onclick="
+                    eliminarDepositoTrazabilidad(
+                        ${depositoTrazabilidadActivo}
+                    )">
+
+                        Eliminar Depósito
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="trazabilidad-datos">
+
+                <div class="trazabilidad-dato">
+
+                    <strong>
+                        Fecha de Encubado
+                    </strong>
+
+                    ${formatearFechaTrazabilidad(
+                        deposito.fechaEncubado
+                    )}
+
+                </div>
+
+
+                <div class="trazabilidad-dato">
+
+                    <strong>
+                        Kgs de Uva
+                    </strong>
+
+                    ${Number(
+                        deposito.kgUva || 0
+                    ).toLocaleString(
+                        "es-ES"
+                    )} kg
+
+                </div>
+
+
+                <div
+                class="trazabilidad-dato"
+                style="grid-column:span 2;">
+
+                    <strong>
+                        Variedad de Uva
+                    </strong>
+
+                    ${deposito.variedad || "-"}
+
+                </div>
+
+                <div class="trazabilidad-dato">
+
+    <strong>
+        Previsión Grado Alcohólico
+    </strong>
+
+    ${
+        deposito.gradoPrevisto !== undefined &&
+        deposito.gradoPrevisto !== null &&
+        deposito.gradoPrevisto !== ""
+        ?
+        Number(deposito.gradoPrevisto).toLocaleString("es-ES", {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        }) + " %"
+        :
+        "-"
+    }
+
+</div>
+                
+
+            </div>
+
+
+            <br>
+
+
+            <div class="trazabilidad-tabla-wrapper">
+
+                <table class="tabla-trazabilidad">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Fecha</th>
+
+                            <th>Temperatura</th>
+
+                            <th>Densidad</th>
+
+                            <th>Cantidad</th>
+
+                            <th>Producto</th>
+
+                            <th>Lote Producto</th>
+
+                            <th>Acciones</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        ${
+                            deposito.seguimiento
+                            .map(
+                                (fila,index)=>
+                                crearFilaTrazabilidad(
+                                    fila,
+                                    index
+                                )
+                            )
+                            .join("")
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <br>
+
+
+            <button
+            class="primary"
+            onclick="
+            agregarSeguimientoTrazabilidad()">
+
+                + Añadir Seguimiento
+
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+// =====================================================
+// CREAR FILA DE SEGUIMIENTO
+// =====================================================
+
+function crearFilaTrazabilidad(
+    fila,
+    index
+){
+
+    const productos =
+    productosTrazabilidad
+    .map(producto=>`
+
+        <option
+        value="${escapeHtmlTrazabilidad(producto)}"
+        ${
+            fila.producto === producto
+            ? "selected"
+            : ""
+        }>
+
+            ${escapeHtmlTrazabilidad(producto)}
+
+        </option>
+
+    `)
+    .join("");
+
+
+    return `
+
+        <tr>
+
+            <td>
+
+                <input
+                type="date"
+                value="${fila.fecha || ""}"
+                onchange="
+                actualizarFechaTrazabilidad(
+                    ${index},
+                    this.value
+                )">
+
+            </td>
+
+
+            <td>
+
+                <input
+                type="number"
+                step="0.1"
+                value="${
+                    fila.temperatura ?? ""
+                }"
+                placeholder="ºC"
+                onchange="
+                actualizarTemperaturaTrazabilidad(
+                    ${index},
+                    this.value
+                )">
+
+            </td>
+
+
+            <td>
+
+                <input
+                type="number"
+                step="1"
+                value="${
+                    fila.densidad ?? ""
+                }"
+                placeholder="Densidad"
+                onchange="
+                actualizarDensidadTrazabilidad(
+                    ${index},
+                    this.value
+                )">
+
+            </td>
+
+
+            <td>
+
+                <input
+                type="text"
+                value="${
+                    escapeHtmlTrazabilidad(
+                        fila.cantidad || ""
+                    )
+                }"
+                placeholder="Ej. 250 g"
+                onchange="
+                actualizarCantidadTrazabilidad(
+                    ${index},
+                    this.value
+                )">
+
+            </td>
+
+
+            <td>
+
+                <select
+                onchange="
+                actualizarProductoTrazabilidad(
+                    ${index},
+                    this.value
+                )">
+
+                    <option value="">
+                        Seleccione
+                    </option>
+
+                    ${productos}
+
+                </select>
+
+            </td>
+
+
+            <td>
+
+                <input
+                type="text"
+                value="${
+                    escapeHtmlTrazabilidad(
+                        fila.lote || ""
+                    )
+                }"
+                placeholder="Lote"
+                onchange="
+                actualizarLoteTrazabilidad(
+                    ${index},
+                    this.value
+                )">
+
+            </td>
+
+
+            <td>
+
+                <div class="trazabilidad-acciones">
+
+                    <button
+                    class="btn-eliminar-traz"
+                    onclick="
+                    eliminarSeguimientoTrazabilidad(
+                        ${index}
+                    )">
+
+                        Eliminar
+
+                    </button>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+    `;
+
+}
+
+// =====================================================
+// ACTUALIZAR SEGUIMIENTO
+// =====================================================
+
+function actualizarSeguimientoTrazabilidad(
+    index,
+    campo,
+    valor
+){
+
+    const deposito =
+    trazabilidad[
+        depositoTrazabilidadActivo
+    ];
+
+    if(!deposito) return;
+
+    deposito.seguimiento[index][campo] =
+    valor;
+
+    guardarDatos();
+
+}
+
+
+window.actualizarFechaTrazabilidad =
+function(index,valor){
+
+    actualizarSeguimientoTrazabilidad(
+        index,
+        "fecha",
+        valor
+    );
+
+};
+
+
+window.actualizarTemperaturaTrazabilidad =
+function(index,valor){
+
+    actualizarSeguimientoTrazabilidad(
+        index,
+        "temperatura",
+        Number(valor) || 0
+    );
+
+};
+
+
+window.actualizarDensidadTrazabilidad =
+function(index,valor){
+
+    actualizarSeguimientoTrazabilidad(
+        index,
+        "densidad",
+        Number(valor) || 0
+    );
+
+};
+
+
+window.actualizarCantidadTrazabilidad =
+function(index,valor){
+
+    actualizarSeguimientoTrazabilidad(
+        index,
+        "cantidad",
+        valor
+    );
+
+};
+
+
+window.actualizarProductoTrazabilidad =
+function(index,valor){
+
+    actualizarSeguimientoTrazabilidad(
+        index,
+        "producto",
+        valor
+    );
+
+};
+
+
+window.actualizarLoteTrazabilidad =
+function(index,valor){
+
+    actualizarSeguimientoTrazabilidad(
+        index,
+        "lote",
+        valor
+    );
+
+};
+
+// =====================================================
+// AÑADIR SEGUIMIENTO
+// =====================================================
+
+window.agregarSeguimientoTrazabilidad =
+function(){
+
+    const deposito =
+    trazabilidad[
+        depositoTrazabilidadActivo
+    ];
+
+    if(!deposito) return;
+
+
+    deposito.seguimiento.push({
+
+        fecha:"",
+
+        temperatura:"",
+
+        densidad:"",
+
+        cantidad:"",
+
+        producto:"",
+
+        lote:""
+
+    });
+
+
+    guardarDatos();
+
+    renderTrazabilidad();
+
+};
+
+
+// =====================================================
+// ELIMINAR SEGUIMIENTO
+// =====================================================
+
+window.eliminarSeguimientoTrazabilidad =
+function(index){
+
+    const deposito =
+    trazabilidad[
+        depositoTrazabilidadActivo
+    ];
+
+    if(!deposito) return;
+
+
+    if(
+        !confirm(
+            "¿Eliminar esta fila de seguimiento?"
+        )
+    ) return;
+
+
+    deposito.seguimiento.splice(
+        index,
+        1
+    );
+
+
+    guardarDatos();
+
+    renderTrazabilidad();
+
+};
+
+// =====================================================
+// EDITAR DEPÓSITO
+// =====================================================
+
+window.editarDepositoTrazabilidad =
+function(index){
+
+    const deposito =
+    trazabilidad[index];
+
+    indiceDepositoTrazabilidadEditando =
+    index;
+
+
+    document.getElementById(
+        "tituloModalDepositoTrazabilidad"
+    ).textContent =
+    "EDITAR DEPÓSITO";
+
+
+    document.getElementById(
+        "trazDeposito"
+    ).value =
+    deposito.deposito;
+
+
+    document.getElementById(
+        "trazVuelta"
+    ).value =
+    deposito.vuelta;
+
+
+    document.getElementById(
+        "trazFechaEncubado"
+    ).value =
+    deposito.fechaEncubado;
+
+
+    document.getElementById(
+        "trazKgUva"
+    ).value =
+    deposito.kgUva;
+
+
+    document.getElementById(
+        "trazVariedad"
+    ).value =
+    deposito.variedad;
+
+    document.getElementById(
+    "trazGradoPrevisto"
+).value =
+deposito.gradoPrevisto ?? "";
+
+
+    modalDepositoTrazabilidad
+    .classList.add("show");
+
+};
+
+
+// =====================================================
+// ELIMINAR DEPÓSITO
+// =====================================================
+
+window.eliminarDepositoTrazabilidad =
+function(index){
+
+    const deposito =
+    trazabilidad[index];
+
+
+    if(
+        !confirm(
+            `¿Eliminar el depósito ${deposito.deposito}/${deposito.vuelta} y todo su historial?`
+        )
+    ) return;
+
+
+    trazabilidad.splice(
+        index,
+        1
+    );
+
+
+    depositoTrazabilidadActivo = null;
+
+
+    guardarDatos();
+
+    renderTrazabilidad();
+
+};
+
+// =====================================================
+// MODAL PRODUCTOS
+// =====================================================
+
+document
+.getElementById(
+    "btnNuevoProductoTrazabilidad"
+)
+.addEventListener("click",()=>{
+
+    indiceProductoTrazabilidadEditando =
+    null;
+
+    document.getElementById(
+        "tituloModalProductoTrazabilidad"
+    ).textContent =
+    "NUEVO PRODUCTO";
+
+
+    document.getElementById(
+        "nombreProductoTrazabilidad"
+    ).value = "";
+
+
+    modalProductoTrazabilidad
+    .classList.add("show");
+
+});
+
+
+document
+.getElementById(
+    "cancelarProductoTrazabilidad"
+)
+.addEventListener("click",()=>{
+
+    modalProductoTrazabilidad
+    .classList.remove("show");
+
+});
+
+// =====================================================
+// GUARDAR PRODUCTO
+// =====================================================
+
+document
+.getElementById(
+    "guardarProductoTrazabilidad"
+)
+.addEventListener("click",()=>{
+
+    const nombre =
+    document.getElementById(
+        "nombreProductoTrazabilidad"
+    ).value.trim();
+
+
+    if(!nombre){
+
+        alert(
+            "Debe indicar el nombre del producto."
+        );
+
+        return;
+
+    }
+
+
+    const existe =
+    productosTrazabilidad.some(
+        (producto,index)=>
+        producto.toLowerCase() ===
+        nombre.toLowerCase() &&
+        index !==
+        indiceProductoTrazabilidadEditando
+    );
+
+
+    if(existe){
+
+        alert(
+            "Ese producto ya existe."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        indiceProductoTrazabilidadEditando === null
+    ){
+
+        productosTrazabilidad.push(
+            nombre
+        );
+
+    }else{
+
+        const nombreAnterior =
+        productosTrazabilidad[
+            indiceProductoTrazabilidadEditando
+        ];
+
+
+        productosTrazabilidad[
+            indiceProductoTrazabilidadEditando
+        ] = nombre;
+
+
+        // Actualizar las filas que
+        // utilizaban el nombre anterior
+
+        trazabilidad.forEach(deposito=>{
+
+            deposito.seguimiento
+            .forEach(fila=>{
+
+                if(
+                    fila.producto ===
+                    nombreAnterior
+                ){
+
+                    fila.producto =
+                    nombre;
+
+                }
+
+            });
+
+        });
+
+    }
+
+
+    guardarDatos();
+
+    modalProductoTrazabilidad
+    .classList.remove("show");
+
+    renderTrazabilidad();
+
+});
+
+// =====================================================
+// RENDER PRODUCTOS
+// =====================================================
+
+function renderProductosTrazabilidad(){
+
+    const tbody =
+    document.querySelector(
+        "#tablaProductosTrazabilidad tbody"
+    );
+
+    if(!tbody) return;
+
+
+    tbody.innerHTML = "";
+
+
+    productosTrazabilidad
+    .forEach((producto,index)=>{
+
+        const tr =
+        document.createElement("tr");
+
+
+        tr.innerHTML = `
+
+            <td>
+                ${escapeHtmlTrazabilidad(producto)}
+            </td>
+
+            <td>
+
+                <div class="trazabilidad-acciones">
+
+                    <button
+                    class="btn-editar-traz"
+                    onclick="
+                    editarProductoTrazabilidad(
+                        ${index}
+                    )">
+
+                        Editar
+
+                    </button>
+
+
+                    <button
+                    class="btn-eliminar-traz"
+                    onclick="
+                    eliminarProductoTrazabilidad(
+                        ${index}
+                    )">
+
+                        Eliminar
+
+                    </button>
+
+                </div>
+
+            </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+// =====================================================
+// EDITAR PRODUCTO
+// =====================================================
+
+window.editarProductoTrazabilidad =
+function(index){
+
+    indiceProductoTrazabilidadEditando =
+    index;
+
+
+    document.getElementById(
+        "tituloModalProductoTrazabilidad"
+    ).textContent =
+    "EDITAR PRODUCTO";
+
+
+    document.getElementById(
+        "nombreProductoTrazabilidad"
+    ).value =
+    productosTrazabilidad[index];
+
+
+    modalProductoTrazabilidad
+    .classList.add("show");
+
+};
+
+
+// =====================================================
+// ELIMINAR PRODUCTO
+// =====================================================
+
+window.eliminarProductoTrazabilidad =
+function(index){
+
+    const producto =
+    productosTrazabilidad[index];
+
+
+    const utilizado =
+    trazabilidad.some(deposito=>
+        deposito.seguimiento.some(
+            fila =>
+            fila.producto === producto
+        )
+    );
+
+
+    if(utilizado){
+
+        alert(
+            "No se puede eliminar este producto porque está utilizado en una o más trazabilidades."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        !confirm(
+            `¿Eliminar el producto "${producto}"?`
+        )
+    ) return;
+
+
+    productosTrazabilidad.splice(
+        index,
+        1
+    );
+
+
+    guardarDatos();
+
+    renderTrazabilidad();
+
+};
+
+// =====================================================
+// UTILIDADES
+// =====================================================
+
+function formatearFechaTrazabilidad(
+    fecha
+){
+
+    if(!fecha) return "-";
+
+
+    const partes =
+    fecha.split("-");
+
+
+    if(partes.length !== 3)
+        return fecha;
+
+
+    return `
+        ${partes[2]}/
+        ${partes[1]}/
+        ${partes[0]}
+    `;
+
+}
+
+
+function escapeHtmlTrazabilidad(
+    texto
+){
+
+    return String(texto ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+// =====================================================
+// INICIALIZAR TRAZABILIDAD
+// =====================================================
+
+renderTrazabilidad();

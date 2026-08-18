@@ -30,6 +30,9 @@
             <button class="nav-btn" data-page="depositos">
                 DEPÓSITOS ENCUBADOS
             </button>
+            <button class="nav-btn" data-page="trazabilidad">
+    TRAZABILIDAD PRODUCTOS
+</button>
             <button class="nav-btn" data-page= "totales">
                 TOTALES
             </button>
@@ -284,6 +287,259 @@
             </table>
 
         </section>
+
+        <!-- ===================================================== -->
+<!-- PAGINA TRAZABILIDAD PRODUCTOS -->
+<!-- ===================================================== -->
+
+<section id="page-trazabilidad" class="page">
+
+    <div class="section-header">
+        <h2>TRAZABILIDAD PRODUCTOS</h2>
+    </div>
+
+    <!-- BOTONES DE DEPÓSITOS -->
+
+    <div class="trazabilidad-toolbar">
+
+        <div
+            id="listaDepositosTrazabilidad"
+            class="lista-depositos-trazabilidad">
+        </div>
+
+        <button
+            id="btnNuevoDepositoTrazabilidad"
+            class="primary">
+            + Nuevo Depósito
+        </button>
+
+    </div>
+
+
+    <!-- CONTENIDO DEL DEPÓSITO SELECCIONADO -->
+
+    <div
+        id="trazabilidadContenido"
+        class="trazabilidad-contenido">
+
+        <div class="trazabilidad-vacio">
+
+            <h3>TRAZABILIDAD DE PRODUCTOS</h3>
+
+            <p>
+                Seleccione un Depósito para ver
+                su Seguimiento de Fermentación.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- GESTIÓN DE PRODUCTOS -->
+    <!-- ================================================= -->
+
+    <div class="productos-trazabilidad-card">
+
+        <div class="productos-header">
+
+            <div>
+                <h3>GESTIÓN DE PRODUCTOS</h3>
+
+                <p>
+                    Productos Disponibles para la
+                    Trazabilidad de Fermentación.
+                </p>
+            </div>
+
+            <button
+                id="btnNuevoProductoTrazabilidad"
+                class="primary">
+                + Nuevo Producto
+            </button>
+
+        </div>
+
+        <table
+            id="tablaProductosTrazabilidad"
+            class="tabla-productos-trazabilidad">
+
+            <thead>
+
+                <tr>
+
+                    <th>Producto</th>
+                    <th>Acciones</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- MODAL NUEVO / EDITAR DEPÓSITO -->
+<!-- ===================================================== -->
+
+<div
+    id="modalDepositoTrazabilidad"
+    class="modal-overlay">
+
+    <div class="modal-box modal-trazabilidad">
+
+        <h3 id="tituloModalDepositoTrazabilidad">
+            NUEVO DEPÓSITO
+        </h3>
+
+        <div class="form-grid">
+
+            <div>
+
+                <label>Depósito</label>
+
+                <input
+                    type="text"
+                    id="trazDeposito">
+
+            </div>
+
+
+            <div>
+
+                <label>Vuelta</label>
+
+                <input
+                    type="number"
+                    id="trazVuelta"
+                    min="1"
+                    max="4">
+
+            </div>
+
+
+            <div>
+
+                <label>Fecha de Encubado</label>
+
+                <input
+                    type="date"
+                    id="trazFechaEncubado">
+
+            </div>
+
+
+            <div>
+
+                <label>Kgs de Uva</label>
+
+                <input
+                    type="number"
+                    id="trazKgUva"
+                    step="0.01"
+                    min="0">
+
+            </div>
+
+
+            <div class="campo-ancho-completo">
+
+                <label>Variedad de Uva</label>
+
+                <input
+                    type="text"
+                    id="trazVariedad"
+                    placeholder="Ej.: Tinta de Toro + Garnacha">
+
+            </div>
+
+            <div>
+    <label>Previsión Grado Alcohólico</label>
+    <input
+        type="number"
+        id="trazGradoPrevisto"
+        step="0.1"
+        min="0"
+        placeholder="Ej: 14.5">
+</div>
+
+        </div>
+
+
+        <div class="modal-actions">
+
+            <button
+                id="cancelarDepositoTrazabilidad"
+                class="secondary">
+                Cancelar
+            </button>
+
+            <button
+                id="guardarDepositoTrazabilidad"
+                class="primary">
+                Guardar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===================================================== -->
+<!-- MODAL NUEVO / EDITAR PRODUCTO -->
+<!-- ===================================================== -->
+
+<div
+    id="modalProductoTrazabilidad"
+    class="modal-overlay">
+
+    <div class="modal-box modal-trazabilidad">
+
+        <h3 id="tituloModalProductoTrazabilidad">
+            NUEVO PRODUCTO
+        </h3>
+
+        <div>
+
+            <label>Nombre del Producto</label>
+
+            <input
+                type="text"
+                id="nombreProductoTrazabilidad"
+                placeholder="Nombre del producto">
+
+        </div>
+
+
+        <div class="modal-actions">
+
+            <button
+                id="cancelarProductoTrazabilidad"
+                class="secondary">
+                Cancelar
+            </button>
+
+            <button
+                id="guardarProductoTrazabilidad"
+                class="primary">
+                Guardar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 <!-- ===================================== -->
 <!-- TOTALES -->
