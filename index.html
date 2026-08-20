@@ -367,12 +367,17 @@
 
             <thead>
 
-                <tr>
+               <tr>
 
-                    <th>Producto</th>
-                    <th>Acciones</th>
+    <th>Producto</th>
+    <th>Proveedor</th>
+    <th>Dosis (g/hL)</th>
+    <th>Características</th>
+    <th>Cantidad Almacén (g)</th>
+    <th>Stock (g)</th>
+    <th>Acciones</th>
 
-                </tr>
+</tr>
 
             </thead>
 
@@ -508,17 +513,57 @@
         <h3 id="tituloModalProductoTrazabilidad">
             NUEVO PRODUCTO
         </h3>
+<div class="form-grid">
 
-        <div>
+    <div class="campo-ancho-completo">
 
-            <label>Nombre del Producto</label>
+        <label>Nombre del Producto</label>
 
-            <input
-                type="text"
-                id="nombreProductoTrazabilidad"
-                placeholder="Nombre del producto">
+        <input 
+            type="text"
+            id="nombreProductoTrazabilidad"
+            placeholder="Nombre del producto">
 
-        </div>
+    </div>
+
+
+    <div>
+
+        <label>Proveedor</label>
+
+        <input
+            type="text"
+            id="proveedorProductoTrazabilidad"
+            placeholder="Proveedor">
+
+    </div>
+
+
+    <div>
+
+        <label>Dosis</label>
+
+        <input
+            type="text"
+            id="dosisProductoTrazabilidad"
+            placeholder="Ej.: 20 g/hl">
+
+    </div>
+
+
+    <div class="campo-ancho-completo">
+
+        <label>Características</label>
+
+        <textarea
+            id="caracteristicasProductoTrazabilidad"
+            rows="3"
+            placeholder="Características del producto">
+        </textarea>
+
+    </div>
+
+</div>
 
 
         <div class="modal-actions">

@@ -1159,3 +1159,81 @@ body{
     }
 
 }
+
+/* ===================================================== */
+/* ANCHO COLUMNAS TABLA SEGUIMIENTO */
+/* ===================================================== */
+
+/* Fecha */
+.tabla-trazabilidad th:nth-child(1),
+.tabla-trazabilidad td:nth-child(1){
+    width:130px;
+}
+
+/* Temperatura */
+.tabla-trazabilidad th:nth-child(2),
+.tabla-trazabilidad td:nth-child(2){
+    width:80px;
+}
+
+/* Densidad */
+.tabla-trazabilidad th:nth-child(3),
+.tabla-trazabilidad td:nth-child(3){
+    width:90px;
+}
+
+/* Cantidad */
+.tabla-trazabilidad th:nth-child(4),
+.tabla-trazabilidad td:nth-child(4){
+    width:90px;
+}
+
+/* Producto */
+.tabla-trazabilidad th:nth-child(5),
+.tabla-trazabilidad td:nth-child(5){
+    width:220px;
+}
+
+/* Lote producto */
+.tabla-trazabilidad th:nth-child(6),
+.tabla-trazabilidad td:nth-child(6){
+    width:130px;
+}
+
+/* Acciones */
+.tabla-trazabilidad th:nth-child(7),
+.tabla-trazabilidad td:nth-child(7){
+    width:110px;
+}
+
+/* ===================================================== */
+/* DATOS DEL ENCABEZADO DEL DEPÓSITO */
+/* ===================================================== */
+
+.trazabilidad-datos{
+    display:grid;
+    grid-template-columns:
+        130px
+        100px
+        1fr
+        150px;
+    
+    width:100%;
+    box-sizing:border-box;
+    gap:10px;
+    align-items:stretch;
+}
+
+.trazabilidad-dato{
+    box-sizing:border-box;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    background:#f8f8f8;
+    min-width:0;
+}
+
+.trazabilidad-dato strong{
+    display:block;
+    margin-bottom:5px;
+}

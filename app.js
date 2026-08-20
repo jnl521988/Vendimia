@@ -4270,10 +4270,9 @@ function renderDepositoTrazabilidadActivo(){
 
                 <div
                 class="trazabilidad-dato"
-                style="grid-column:span 2;">
 
                     <strong>
-                        Variedad de Uva
+                        Variedad de Uva:
                     </strong>
 
                     ${deposito.variedad || "-"}
@@ -4318,11 +4317,11 @@ function renderDepositoTrazabilidadActivo(){
 
                             <th>Fecha</th>
 
-                            <th>Temperatura</th>
+                            <th>Temperatura (ºC)</th>
 
-                            <th>Densidad</th>
+                            <th>Densidad (g/L)</th>
 
-                            <th>Cantidad</th>
+                            <th>Cantidad (g)</th>
 
                             <th>Producto</th>
 
@@ -4382,24 +4381,35 @@ function crearFilaTrazabilidad(
     index
 ){
 
-    const productos =
-    productosTrazabilidad
-    .map(producto=>`
+   const productos = 
+productosTrazabilidad
+.map(producto=>{
 
-        <option
-        value="${escapeHtmlTrazabilidad(producto)}"
+    const nombreProducto =
+    typeof producto === "string"
+    ?
+    producto
+    :
+    producto.nombre;
+
+    return `
+
+        <option 
+        value="${escapeHtmlTrazabilidad(nombreProducto)}"
         ${
-            fila.producto === producto
+            fila.producto === nombreProducto
             ? "selected"
             : ""
         }>
 
-            ${escapeHtmlTrazabilidad(producto)}
+            ${escapeHtmlTrazabilidad(nombreProducto)}
 
         </option>
 
-    `)
-    .join("");
+    `;
+
+})
+.join("");
 
 
     return `
@@ -4458,19 +4468,17 @@ function crearFilaTrazabilidad(
 
             <td>
 
-                <input
-                type="text"
-                value="${
-                    escapeHtmlTrazabilidad(
-                        fila.cantidad || ""
-                    )
-                }"
-                placeholder="Ej. 250 g"
-                onchange="
-                actualizarCantidadTrazabilidad(
-                    ${index},
-                    this.value
-                )">
+               <input 
+    type="number" 
+    min="0"
+    step="0.1"
+    value="${fila.cantidad ?? ""}" 
+    placeholder="g"
+    onchange="
+        actualizarCantidadTrazabilidad(
+            ${index},
+            this.value
+        )">
 
             </td>
 
@@ -4606,8 +4614,10 @@ function(index,valor){
     actualizarSeguimientoTrazabilidad(
         index,
         "cantidad",
-        valor
+        Number(valor) || 0
     );
+
+    renderProductosTrazabilidad();
 
 };
 
@@ -4807,24 +4817,30 @@ function(index){
 // =====================================================
 
 document
-.getElementById(
-    "btnNuevoProductoTrazabilidad"
-)
+.getElementById("btnNuevoProductoTrazabilidad")
 .addEventListener("click",()=>{
 
-    indiceProductoTrazabilidadEditando =
-    null;
+    indiceProductoTrazabilidadEditando = null;
 
     document.getElementById(
         "tituloModalProductoTrazabilidad"
-    ).textContent =
-    "NUEVO PRODUCTO";
-
+    ).textContent = "NUEVO PRODUCTO";
 
     document.getElementById(
         "nombreProductoTrazabilidad"
     ).value = "";
 
+    document.getElementById(
+        "proveedorProductoTrazabilidad"
+    ).value = "";
+
+    document.getElementById(
+        "dosisProductoTrazabilidad"
+    ).value = "";
+
+    document.getElementById(
+        "caracteristicasProductoTrazabilidad"
+    ).value = "";
 
     modalProductoTrazabilidad
     .classList.add("show");
@@ -4832,10 +4848,12 @@ document
 });
 
 
+// =====================================================
+// CANCELAR
+// =====================================================
+
 document
-.getElementById(
-    "cancelarProductoTrazabilidad"
-)
+.getElementById("cancelarProductoTrazabilidad")
 .addEventListener("click",()=>{
 
     modalProductoTrazabilidad
@@ -4843,19 +4861,33 @@ document
 
 });
 
+
 // =====================================================
 // GUARDAR PRODUCTO
 // =====================================================
 
 document
-.getElementById(
-    "guardarProductoTrazabilidad"
-)
+.getElementById("guardarProductoTrazabilidad")
 .addEventListener("click",()=>{
 
     const nombre =
     document.getElementById(
         "nombreProductoTrazabilidad"
+    ).value.trim();
+
+    const proveedor =
+    document.getElementById(
+        "proveedorProductoTrazabilidad"
+    ).value.trim();
+
+    const dosis =
+    document.getElementById(
+        "dosisProductoTrazabilidad"
+    ).value.trim();
+
+    const caracteristicas =
+    document.getElementById(
+        "caracteristicasProductoTrazabilidad"
     ).value.trim();
 
 
@@ -4870,13 +4902,29 @@ document
     }
 
 
+    // Comprobar productos duplicados
+
     const existe =
     productosTrazabilidad.some(
-        (producto,index)=>
-        producto.toLowerCase() ===
-        nombre.toLowerCase() &&
-        index !==
-        indiceProductoTrazabilidadEditando
+        (producto,index)=>{
+
+            const nombreProducto =
+            typeof producto === "string"
+            ?
+            producto
+            :
+            producto.nombre;
+
+            return(
+                nombreProducto.toLowerCase()
+                ===
+                nombre.toLowerCase()
+                &&
+                index !==
+                indiceProductoTrazabilidadEditando
+            );
+
+        }
     );
 
 
@@ -4891,48 +4939,105 @@ document
     }
 
 
+    // =================================================
+    // NUEVO PRODUCTO
+    // =================================================
+
     if(
         indiceProductoTrazabilidadEditando === null
     ){
 
-        productosTrazabilidad.push(
-            nombre
-        );
+        productosTrazabilidad.push({
 
-    }else{
+            nombre,
 
-        const nombreAnterior =
+            proveedor,
+
+            dosis,
+
+            caracteristicas,
+
+            cantidad:0
+
+        });
+
+    }
+
+    // =================================================
+    // EDITAR PRODUCTO
+    // =================================================
+
+    else{
+
+        const producto =
         productosTrazabilidad[
             indiceProductoTrazabilidadEditando
         ];
 
 
-        productosTrazabilidad[
-            indiceProductoTrazabilidadEditando
-        ] = nombre;
+        // Compatibilidad con productos antiguos
+        if(typeof producto === "string"){
+
+            productosTrazabilidad[
+                indiceProductoTrazabilidadEditando
+            ] = {
+
+                nombre,
+
+                proveedor,
+
+                dosis,
+
+                caracteristicas,
+
+                cantidad:0
+
+            };
+
+        }
+
+        else{
+
+            const nombreAnterior =
+            producto.nombre;
 
 
-        // Actualizar las filas que
-        // utilizaban el nombre anterior
+            producto.nombre =
+            nombre;
 
-        trazabilidad.forEach(deposito=>{
+            producto.proveedor =
+            proveedor;
 
-            deposito.seguimiento
-            .forEach(fila=>{
+            producto.dosis =
+            dosis;
 
-                if(
-                    fila.producto ===
-                    nombreAnterior
-                ){
+            producto.caracteristicas =
+            caracteristicas;
 
-                    fila.producto =
-                    nombre;
 
-                }
+            // Actualizar el nombre en las
+            // trazabilidades existentes
+
+            trazabilidad.forEach(deposito=>{
+
+                deposito.seguimiento
+                .forEach(fila=>{
+
+                    if(
+                        fila.producto ===
+                        nombreAnterior
+                    ){
+
+                        fila.producto =
+                        nombre;
+
+                    }
+
+                });
 
             });
 
-        });
+        }
 
     }
 
@@ -4946,6 +5051,129 @@ document
 
 });
 
+
+// =====================================================
+// CALCULAR STOCK
+// =====================================================
+
+function calcularStockProducto(
+    productoNombre
+){
+
+    let producto =
+    productosTrazabilidad.find(
+        p=>{
+
+            const nombre =
+            typeof p === "string"
+            ?
+            p
+            :
+            p.nombre;
+
+            return nombre === productoNombre;
+
+        }
+    );
+
+
+    if(!producto)
+        return 0;
+
+
+    const cantidadInicial =
+    typeof producto === "string"
+    ?
+    0
+    :
+    Number(producto.cantidad || 0);
+
+
+    let consumido = 0;
+
+
+    trazabilidad.forEach(deposito=>{
+
+        deposito.seguimiento
+        .forEach(fila=>{
+
+            if(
+                fila.producto !==
+                productoNombre
+            ){
+
+                return;
+
+            }
+
+
+            const cantidad =
+            Number(
+                fila.cantidad
+            ) || 0;
+
+
+            consumido += cantidad;
+
+        });
+
+    });
+
+
+    return cantidadInicial - consumido;
+
+}
+
+
+// =====================================================
+// CAMBIAR CANTIDAD DEL PRODUCTO
+// =====================================================
+
+window.actualizarCantidadProductoTrazabilidad =
+function(index,valor){
+
+    const producto =
+    productosTrazabilidad[index];
+
+    if(!producto)
+        return;
+
+
+    // Convertir productos antiguos
+    if(typeof producto === "string"){
+
+        productosTrazabilidad[index] = {
+
+            nombre:producto,
+
+            proveedor:"",
+
+            dosis:"",
+
+            caracteristicas:"",
+
+            cantidad:
+            Number(valor) || 0
+
+        };
+
+    }
+
+    else{
+
+        producto.cantidad =
+        Number(valor) || 0;
+
+    }
+
+
+    guardarDatos();
+
+    renderProductosTrazabilidad();
+
+};
+
+
 // =====================================================
 // RENDER PRODUCTOS
 // =====================================================
@@ -4957,7 +5185,9 @@ function renderProductosTrazabilidad(){
         "#tablaProductosTrazabilidad tbody"
     );
 
-    if(!tbody) return;
+
+    if(!tbody)
+        return;
 
 
     tbody.innerHTML = "";
@@ -4966,6 +5196,44 @@ function renderProductosTrazabilidad(){
     productosTrazabilidad
     .forEach((producto,index)=>{
 
+        // Compatibilidad con productos antiguos
+
+        if(typeof producto === "string"){
+
+            productosTrazabilidad[index] = {
+
+                nombre:producto,
+
+                proveedor:"",
+
+                dosis:"",
+
+                caracteristicas:"",
+
+                cantidad:0
+
+            };
+
+            producto =
+            productosTrazabilidad[index];
+
+        }
+
+
+        const stock =
+        calcularStockProducto(
+            producto.nombre
+        );
+
+
+        const stockClase =
+        stock <= 2000
+        ?
+        "stock-bajo"
+        :
+        "";
+
+
         const tr =
         document.createElement("tr");
 
@@ -4973,8 +5241,80 @@ function renderProductosTrazabilidad(){
         tr.innerHTML = `
 
             <td>
-                ${escapeHtmlTrazabilidad(producto)}
+
+                ${escapeHtmlTrazabilidad(
+                    producto.nombre
+                )}
+
             </td>
+
+
+            <td>
+
+                ${escapeHtmlTrazabilidad(
+                    producto.proveedor || ""
+                )}
+
+            </td>
+
+
+            <td>
+
+                ${escapeHtmlTrazabilidad(
+                    producto.dosis || ""
+                )}
+
+            </td>
+
+
+            <td>
+
+                ${escapeHtmlTrazabilidad(
+                    producto.caracteristicas || ""
+                )}
+
+            </td>
+
+
+            <td>
+
+                <input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    value="${
+                        Number(
+                            producto.cantidad || 0
+                        )
+                    }"
+                    onchange="
+                        actualizarCantidadProductoTrazabilidad(
+                            ${index},
+                            this.value
+                        )
+                    "
+                >
+
+                
+
+            </td>
+
+
+            <td class="${stockClase}">
+
+                <strong>
+                    ${
+                        stock.toLocaleString(
+                            "es-ES",
+                            {
+                                maximumFractionDigits:1
+                            }
+                        )
+                    } 
+                </strong>
+
+            </td>
+
 
             <td>
 
@@ -5014,7 +5354,11 @@ function renderProductosTrazabilidad(){
 
     });
 
+
+    guardarDatos();
+
 }
+
 
 // =====================================================
 // EDITAR PRODUCTO
@@ -5022,6 +5366,10 @@ function renderProductosTrazabilidad(){
 
 window.editarProductoTrazabilidad =
 function(index){
+
+    const producto =
+    productosTrazabilidad[index];
+
 
     indiceProductoTrazabilidadEditando =
     index;
@@ -5033,10 +5381,53 @@ function(index){
     "EDITAR PRODUCTO";
 
 
-    document.getElementById(
-        "nombreProductoTrazabilidad"
-    ).value =
-    productosTrazabilidad[index];
+    if(typeof producto === "string"){
+
+        document.getElementById(
+            "nombreProductoTrazabilidad"
+        ).value =
+        producto;
+
+        document.getElementById(
+            "proveedorProductoTrazabilidad"
+        ).value = "";
+
+        document.getElementById(
+            "dosisProductoTrazabilidad"
+        ).value = "";
+
+        document.getElementById(
+            "caracteristicasProductoTrazabilidad"
+        ).value = "";
+
+    }
+
+    else{
+
+        document.getElementById(
+            "nombreProductoTrazabilidad"
+        ).value =
+        producto.nombre || "";
+
+
+        document.getElementById(
+            "proveedorProductoTrazabilidad"
+        ).value =
+        producto.proveedor || "";
+
+
+        document.getElementById(
+            "dosisProductoTrazabilidad"
+        ).value =
+        producto.dosis || "";
+
+
+        document.getElementById(
+            "caracteristicasProductoTrazabilidad"
+        ).value =
+        producto.caracteristicas || "";
+
+    }
 
 
     modalProductoTrazabilidad
@@ -5056,11 +5447,21 @@ function(index){
     productosTrazabilidad[index];
 
 
+    const nombreProducto =
+    typeof producto === "string"
+    ?
+    producto
+    :
+    producto.nombre;
+
+
     const utilizado =
-    trazabilidad.some(deposito=>
+    trazabilidad.some(
+        deposito=>
         deposito.seguimiento.some(
-            fila =>
-            fila.producto === producto
+            fila=>
+            fila.producto ===
+            nombreProducto
         )
     );
 
@@ -5078,9 +5479,10 @@ function(index){
 
     if(
         !confirm(
-            `¿Eliminar el producto "${producto}"?`
+            `¿Eliminar el producto "${nombreProducto}"?`
         )
-    ) return;
+    )
+    return;
 
 
     productosTrazabilidad.splice(
