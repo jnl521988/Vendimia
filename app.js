@@ -4268,16 +4268,15 @@ function renderDepositoTrazabilidadActivo(){
                 </div>
 
 
-                <div
-                class="trazabilidad-dato"
+               <div class="trazabilidad-dato">
 
-                    <strong>
-                        Variedad de Uva:
-                    </strong>
+    <strong>
+        Variedad de Uva
+    </strong>
 
-                    ${deposito.variedad || "-"}
+    ${deposito.variedad || "-"}
 
-                </div>
+</div>
 
                 <div class="trazabilidad-dato">
 
