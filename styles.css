@@ -1701,3 +1701,23 @@ table td{
     }
 
 }
+
+@media (max-width:768px){
+
+    button{
+        width:auto !important;
+        max-width:none;
+    }
+
+    .primary,
+    .secondary,
+    .danger,
+    .edit,
+    .btn-eliminar-traz,
+    .btn-editar-traz,
+    .btn-deposito-trazabilidad,
+    .nav-btn{
+        width:auto !important;
+    }
+
+}
