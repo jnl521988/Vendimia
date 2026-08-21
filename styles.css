@@ -1145,15 +1145,20 @@ table td{
         margin:0;
     }
 
+.logo-img{
+    position:static;
+    width:55px;
+    height:auto;
+    margin-bottom:5px;
+}
 
-    .logo-img{
-        position:absolute;
+.logo{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
 
-        left:10px;
-        top:10px;
-
-        width:60px;
-        height:auto;
     }
 
 
@@ -1718,6 +1723,200 @@ table td{
     .btn-deposito-trazabilidad,
     .nav-btn{
         width:auto !important;
+    }
+
+}
+
+@media (max-width:768px){
+
+    html,
+    body{
+        width:100%;
+        min-width:0;
+        max-width:100%;
+        overflow-x:hidden;
+    }
+
+    main{
+        width:100%;
+        padding:10px;
+    }
+
+    /* CABECERA */
+
+    .topbar{
+        width:100%;
+        min-width:0;
+        padding:10px;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        gap:8px;
+    }
+
+    .logo{
+        width:100%;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+    }
+
+    .logo-img{
+        position:static;
+        width:55px;
+        height:auto;
+        margin-bottom:5px;
+    }
+
+    .logo h1{
+        font-size:20px;
+        margin:0;
+        text-align:center;
+    }
+
+    /* NAVEGACIÓN */
+
+    .nav-buttons{
+        width:100%;
+        display:flex;
+        flex-wrap:nowrap;
+        justify-content:flex-start;
+        gap:6px;
+        overflow-x:auto;
+        padding:2px;
+    }
+
+    .nav-btn{
+        flex:0 0 auto;
+        width:auto;
+        padding:8px 11px;
+        font-size:12px;
+        white-space:nowrap;
+    }
+
+    /* BOTONES */
+
+    button{
+        width:auto !important;
+    }
+
+    .primary,
+    .secondary,
+    .danger,
+    .edit{
+        width:auto !important;
+    }
+
+    /* TABLAS */
+
+    .page{
+        width:100%;
+        overflow-x:hidden;
+    }
+
+    .table-scroll{
+        width:100%;
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    table{
+        display:table;
+        width:max-content;
+        min-width:100%;
+        white-space:nowrap;
+        font-size:12px;
+    }
+
+    table th{
+        padding:7px;
+    }
+
+    table td{
+        padding:6px;
+    }
+
+    /* ENTRADAS DE UVA */
+
+    #page-entradas{
+        width:100%;
+        overflow-x:auto;
+    }
+
+    #entradasTable{
+        width:max-content;
+        min-width:1400px;
+    }
+
+    /* TRAZABILIDAD */
+
+    .trazabilidad-card{
+        width:100%;
+        padding:12px;
+        overflow:hidden;
+    }
+
+    .trazabilidad-datos{
+        display:grid;
+        grid-template-columns:
+            1fr
+            1fr
+            2fr
+            1.2fr;
+        gap:6px;
+        width:100%;
+    }
+
+    .trazabilidad-dato{
+        min-width:0;
+        padding:8px;
+    }
+
+    .trazabilidad-tabla-wrapper{
+        width:100%;
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    .tabla-trazabilidad{
+        display:table;
+        width:850px;
+        min-width:850px;
+        white-space:nowrap;
+    }
+
+    /* PRODUCTOS */
+
+    .productos-trazabilidad-card{
+        width:100%;
+        padding:12px;
+        overflow-x:auto;
+    }
+
+    .tabla-productos-trazabilidad{
+        width:max-content;
+        min-width:100%;
+        white-space:nowrap;
+    }
+
+    /* ACCIONES */
+
+    .actions,
+    .trazabilidad-acciones{
+        display:flex;
+        flex-direction:row;
+        flex-wrap:nowrap;
+        justify-content:center;
+        gap:4px;
+    }
+
+    .actions button,
+    .trazabilidad-acciones button{
+        width:auto !important;
+        padding:6px 8px;
+        font-size:11px;
+        white-space:nowrap;
     }
 
 }
