@@ -2171,46 +2171,51 @@ ${e.kgNeto}
 
 </td>
 
-<td>
+<td> 
 
-<input
-type="number"
-step="0.1"
+<input 
+type="number" 
+step="0.1" 
 
-value="${e.grado}"
+value="${e.grado}" 
 
-onchange="
-entradas[${index}].grado =
-Number(this.value)
+onchange=" 
+entradas[${index}].grado = 
+Number(this.value); 
+guardarDatos(); 
+">
+
+</td> 
+
+<td> 
+
+<input 
+type="number" 
+
+value="${e.deposito}" 
+
+onchange=" 
+entradas[${index}].deposito = 
+this.value; 
+guardarDatos(); 
+">
+
+</td> 
+
+<td> 
+
+<input 
+type="number" 
+
+value="${e.vuelta}" 
+
+onchange=" 
+entradas[${index}].vuelta = 
+this.value; 
+guardarDatos(); 
 ">
 
 </td>
-
-<td>
-
-<input
-type="number"
-
-value="${e.deposito}"
-
-onchange="
-entradas[${index}].deposito =
-this.value
-">
-
-</td>
-
-<td>
-
-<input
-type="number"
-
-value="${e.vuelta}"
-
-onchange="
-entradas[${index}].vuelta =
-this.value
-">
 
 </td>
 
