@@ -100,6 +100,483 @@ function exportarPDF(){
     const pagina =
     document.querySelector(".page.active");
 
+     // =====================================
+// TRAZABILIDAD DE PRODUCTOS
+// =====================================
+
+if (pagina.id === "page-trazabilidad") {
+
+    if (
+        !Array.isArray(trazabilidad) ||
+        trazabilidad.length === 0
+    ) {
+
+        alert("No hay depósitos de trazabilidad registrados.");
+        return;
+
+    }
+
+
+    // =====================================
+    // CREAR LISTA DE OPCIONES
+    // =====================================
+
+    const opciones = [
+        "1 - TABLA DE PRODUCTOS"
+    ];
+
+
+    trazabilidad.forEach((deposito, index) => {
+
+        opciones.push(
+            `${index + 2} - DEPÓSITO ${deposito.deposito} / ${deposito.vuelta}`
+        );
+
+    });
+
+
+    const seleccion = prompt(
+        "¿QUÉ QUIERES EXPORTAR?\n\n" +
+        opciones.join("\n")
+    );
+
+
+    if (seleccion === null) {
+        return;
+    }
+
+
+    const numero = Number(seleccion);
+
+
+    if (
+        !Number.isInteger(numero) ||
+        numero < 1 ||
+        numero > opciones.length
+    ) {
+
+        alert("Selección no válida.");
+        return;
+
+    }
+
+
+    // =====================================
+    // TABLA DE PRODUCTOS
+    // =====================================
+
+    if (numero === 1) {
+
+        exportarProductosTrazabilidadPDF();
+
+        return;
+
+    }
+
+
+    // =====================================
+    // DEPÓSITO SELECCIONADO
+    // =====================================
+
+    const indiceDeposito = numero - 2;
+
+    exportarDepositoTrazabilidadPDF(
+        indiceDeposito
+    );
+
+    return;
+
+}
+
+// =====================================
+// PDF - TABLA DE PRODUCTOS
+// =====================================
+
+function exportarProductosTrazabilidadPDF() {
+
+    const { jsPDF } = window.jspdf;
+
+    const doc =
+        new jsPDF("landscape");
+
+
+    doc.setFontSize(16);
+
+    doc.text(
+        "PRODUCTOS - TRAZABILIDAD",
+        14,
+        15
+    );
+
+
+    const filas = [];
+
+
+    productosTrazabilidad.forEach(
+        producto => {
+
+            // Compatibilidad con productos antiguos
+
+            if (
+                typeof producto === "string"
+            ) {
+
+                producto = {
+
+                    nombre: producto,
+                    proveedor: "",
+                    dosis: "",
+                    caracteristicas: "",
+                    lote: "",
+                    cantidad: 0
+
+                };
+
+            }
+
+
+            const stock =
+                calcularStockProducto(
+                    producto.nombre
+                );
+
+
+            filas.push([
+
+                producto.nombre || "",
+
+                producto.proveedor || "",
+
+                producto.dosis || "",
+
+                producto.caracteristicas || "",
+
+                producto.lote || "",
+
+                Number(
+                    producto.cantidad || 0
+                ).toLocaleString(
+                    "es-ES",
+                    {
+                        maximumFractionDigits: 1
+                    }
+                ),
+
+                Number(stock).toLocaleString(
+                    "es-ES",
+                    {
+                        maximumFractionDigits: 1
+                    }
+                )
+
+            ]);
+
+        }
+    );
+
+
+    doc.autoTable({
+
+        startY: 25,
+
+        head: [[
+
+            "Producto",
+            "Proveedor",
+            "Dosis (g/hL)",
+            "Características",
+            "Lote Producto",
+            "Cantidad (Kg)",
+            "Stock (Kg)"
+
+        ]],
+
+        body: filas,
+
+        theme: "grid",
+
+        headStyles: {
+
+            fillColor: [
+                210,
+                140,
+                135
+            ]
+
+        },
+
+        styles: {
+
+            fontSize: 8,
+            cellPadding: 2
+
+        }
+
+    });
+
+
+    doc.save(
+        "Productos_Trazabilidad.pdf"
+    );
+
+}
+
+// =====================================
+// PDF - DEPÓSITO DE TRAZABILIDAD
+// =====================================
+
+function exportarDepositoTrazabilidadPDF(
+    indice
+) {
+
+    const { jsPDF } = window.jspdf;
+
+
+    const deposito =
+        trazabilidad[indice];
+
+
+    if (!deposito) {
+
+        alert(
+            "No se ha encontrado el depósito."
+        );
+
+        return;
+
+    }
+
+
+    const doc =
+        new jsPDF("landscape");
+
+
+    // =====================================
+    // CABECERA
+    // =====================================
+
+    doc.setFontSize(18);
+
+    doc.text(
+
+        `DEPÓSITO ${deposito.deposito} / ${deposito.vuelta}`,
+
+        14,
+        15
+
+    );
+
+
+    // =====================================
+    // DATOS DEL DEPÓSITO
+    // =====================================
+
+    const datosDeposito = [
+
+        [
+            "Fecha de Encubado",
+            formatearFechaTrazabilidad(
+                deposito.fechaEncubado
+            )
+        ],
+
+        [
+            "Kgs de Uva",
+            Number(
+                deposito.kgUva || 0
+            ).toLocaleString(
+                "es-ES"
+            ) + " kg"
+        ],
+
+        [
+            "Variedad de Uva",
+            deposito.variedad || "-"
+        ],
+
+        [
+            "Previsión Grado Alcohólico",
+            deposito.gradoPrevisto !== undefined &&
+            deposito.gradoPrevisto !== null &&
+            deposito.gradoPrevisto !== ""
+            ?
+            Number(
+                deposito.gradoPrevisto
+            ).toLocaleString(
+                "es-ES",
+                {
+                    minimumFractionDigits: 1,
+                    maximumFractionDigits: 1
+                }
+            ) + " %"
+            :
+            "-"
+        ]
+
+    ];
+
+
+   doc.autoTable({
+
+    startY: 22,
+
+    body: datosDeposito,
+
+    theme: "grid",
+
+    columnStyles: {
+
+        0: {
+            fontStyle: "bold",
+            cellWidth: 55
+        },
+
+        1: {
+            cellWidth: 100,
+            overflow: "visible",
+            noWrap: true
+        }
+
+    },
+
+    styles: {
+
+        fontSize: 9,
+        cellPadding: 3,
+        overflow: "visible"
+    }
+
+});
+
+
+    // =====================================
+    // TABLA DE SEGUIMIENTO
+    // =====================================
+
+    const filas = [];
+
+
+    (
+        deposito.seguimiento || []
+    ).forEach(fila => {
+
+        filas.push([
+
+            fila.fecha
+            ? formatearFechaTrazabilidad(
+                fila.fecha
+            )
+            : "",
+
+            fila.temperatura ?? "",
+
+            fila.densidad ?? "",
+
+            fila.cantidad ?? "",
+
+            fila.producto || "",
+
+            fila.lote || ""
+
+        ]);
+
+    });
+
+
+    let posicionY =
+        doc.lastAutoTable.finalY + 10;
+
+
+    doc.setFontSize(14);
+
+    doc.text(
+        "Seguimiento",
+        14,
+        posicionY
+    );
+
+
+   doc.autoTable({
+
+    startY: posicionY + 5,
+
+    head: [[
+
+        "Fecha",
+        "Temperatura (ºC)",
+        "Densidad (g/L)",
+        "Cantidad (g)",
+        "Producto",
+        "Lote Producto"
+
+    ]],
+
+    body: filas,
+
+    theme: "grid",
+
+    headStyles: {
+
+        fillColor: [
+            210,
+            140,
+            135
+        ]
+
+    },
+
+    columnStyles: {
+
+        0: {
+            cellWidth: 40,
+            noWrap: true,
+            overflow: "visible"
+        },
+
+        1: {
+            cellWidth: 27
+        },
+
+        2: {
+            cellWidth: 30
+        },
+
+        3: {
+            cellWidth: 27
+        },
+
+        4: {
+            cellWidth: 55
+        },
+
+        5: {
+            cellWidth: 35
+        }
+
+    },
+
+    styles: {
+
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: "linebreak"
+    }
+
+});
+
+
+    // =====================================
+    // NOMBRE DEL ARCHIVO
+    // =====================================
+
+    doc.save(
+
+        `Deposito_${deposito.deposito}_Vuelta_${deposito.vuelta}_Trazabilidad.pdf`
+
+    );
+
+}
+
     // =====================================
 // VITICULTORES
 // =====================================
@@ -808,8 +1285,6 @@ function exportarViticultorPDF(indice) {
     }
 
 }
-
-
 
 // =======================================
 // TABLA VITICULTORES
@@ -4325,7 +4800,7 @@ function renderDepositoTrazabilidadActivo(){
 
                             <th>Densidad (g/L)</th>
 
-                            <th>Cantidad (g)</th>
+                            <th>Cantidad (Kg)</th>
 
                             <th>Producto</th>
 
@@ -4477,7 +4952,7 @@ productosTrazabilidad
     min="0"
     step="0.1"
     value="${fila.cantidad ?? ""}" 
-    placeholder="g"
+    placeholder="Kg"
     onchange="
         actualizarCantidadTrazabilidad(
             ${index},
@@ -4629,11 +5104,63 @@ function(index,valor){
 window.actualizarProductoTrazabilidad =
 function(index,valor){
 
-    actualizarSeguimientoTrazabilidad(
-        index,
-        "producto",
-        valor
-    );
+    const deposito =
+    trazabilidad[
+        depositoTrazabilidadActivo
+    ];
+
+    if(!deposito) return;
+
+
+    // Guardar el producto seleccionado
+
+    deposito.seguimiento[index].producto =
+    valor;
+
+
+    // =========================================
+    // BUSCAR EL LOTE DEL PRODUCTO
+    // =========================================
+
+    const producto =
+    productosTrazabilidad.find(p=>{
+
+        const nombre =
+        typeof p === "string"
+        ?
+        p
+        :
+        p.nombre;
+
+        return nombre === valor;
+
+    });
+
+
+    // =========================================
+    // PONER AUTOMÁTICAMENTE EL LOTE
+    // =========================================
+
+    if(producto && typeof producto !== "string"){
+
+        deposito.seguimiento[index].lote =
+        producto.lote || "";
+
+    }
+    else{
+
+        deposito.seguimiento[index].lote =
+        "";
+
+    }
+
+
+    guardarDatos();
+
+
+    // Volver a dibujar para mostrar el lote
+
+    renderDepositoTrazabilidadActivo();
 
 };
 
@@ -4846,6 +5373,10 @@ document
         "caracteristicasProductoTrazabilidad"
     ).value = "";
 
+    document.getElementById(
+    "loteProductoTrazabilidad"
+).value = "";
+
     modalProductoTrazabilidad
     .classList.add("show");
 
@@ -4893,6 +5424,11 @@ document
     document.getElementById(
         "caracteristicasProductoTrazabilidad"
     ).value.trim();
+
+    const lote =
+document.getElementById(
+    "loteProductoTrazabilidad"
+).value.trim();
 
 
     if(!nombre){
@@ -4959,6 +5495,8 @@ document
 
             dosis,
 
+            lote,
+
             caracteristicas,
 
             cantidad:0
@@ -4992,6 +5530,8 @@ document
 
                 dosis,
 
+                lote,
+
                 caracteristicas,
 
                 cantidad:0
@@ -5015,31 +5555,38 @@ document
             producto.dosis =
             dosis;
 
+            producto.lote =
+            lote;
+
             producto.caracteristicas =
             caracteristicas;
 
 
+
             // Actualizar el nombre en las
             // trazabilidades existentes
+trazabilidad.forEach(deposito => {
 
-            trazabilidad.forEach(deposito=>{
+    deposito.seguimiento.forEach(fila => {
 
-                deposito.seguimiento
-                .forEach(fila=>{
+        if(
+            fila.producto ===
+            nombreAnterior
+        ){
 
-                    if(
-                        fila.producto ===
-                        nombreAnterior
-                    ){
+            // Actualizar el nombre si ha cambiado
+            fila.producto =
+            nombre;
 
-                        fila.producto =
-                        nombre;
+            // Actualizar también el lote
+            fila.lote =
+            lote;
 
-                    }
+        }
 
-                });
+    });
 
-            });
+});
 
         }
 
@@ -5154,6 +5701,8 @@ function(index,valor){
 
             dosis:"",
 
+            lote:"",
+
             caracteristicas:"",
 
             cantidad:
@@ -5212,6 +5761,8 @@ function renderProductosTrazabilidad(){
 
                 dosis:"",
 
+                lote:"",
+
                 caracteristicas:"",
 
                 cantidad:0
@@ -5231,7 +5782,7 @@ function renderProductosTrazabilidad(){
 
 
         const stockClase =
-        stock <= 2000
+        stock <= 1000
         ?
         "stock-bajo"
         :
@@ -5239,7 +5790,11 @@ function renderProductosTrazabilidad(){
 
 
         const tr =
-        document.createElement("tr");
+document.createElement("tr");
+
+if(stock <= 1000){
+    tr.classList.add("stock-bajo");
+}
 
 
         tr.innerHTML = `
@@ -5279,6 +5834,10 @@ function renderProductosTrazabilidad(){
 
             </td>
 
+     <td>
+    ${escapeHtmlTrazabilidad(producto.lote || "")}
+</td>
+
 
             <td>
 
@@ -5304,14 +5863,14 @@ function renderProductosTrazabilidad(){
             </td>
 
 
-            <td class="${stockClase}">
+            <td>
 
                 <strong>
                     ${
                         stock.toLocaleString(
                             "es-ES",
                             {
-                                maximumFractionDigits:1
+                                maximumFractionDigits:2
                             }
                         )
                     } 
@@ -5404,6 +5963,10 @@ function(index){
             "caracteristicasProductoTrazabilidad"
         ).value = "";
 
+        document.getElementById(
+    "loteProductoTrazabilidad"
+).value = "";
+
     }
 
     else{
@@ -5430,6 +5993,11 @@ function(index){
             "caracteristicasProductoTrazabilidad"
         ).value =
         producto.caracteristicas || "";
+
+        document.getElementById(
+    "loteProductoTrazabilidad"
+).value =
+producto.lote || "";
 
     }
 
@@ -5505,29 +6073,18 @@ function(index){
 // UTILIDADES
 // =====================================================
 
-function formatearFechaTrazabilidad(
-    fecha
-){
+function formatearFechaTrazabilidad(fecha){
 
     if(!fecha) return "-";
 
-
-    const partes =
-    fecha.split("-");
-
+    const partes = fecha.split("-");
 
     if(partes.length !== 3)
         return fecha;
 
-
-    return `
-        ${partes[2]}/
-        ${partes[1]}/
-        ${partes[0]}
-    `;
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
 
 }
-
 
 function escapeHtmlTrazabilidad(
     texto

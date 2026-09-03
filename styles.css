@@ -1661,6 +1661,14 @@ table td{
         white-space:nowrap;
     }
 
+    .tabla-productos-trazabilidad tr.stock-bajo {
+    background-color: #ffcccc;
+}
+
+.tabla-productos-trazabilidad tr.stock-bajo td {
+    background-color: #ffcccc;
+}
+
 
     /* ================================================= */
     /* RESUMEN VITICULTORES */
