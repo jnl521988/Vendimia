@@ -5782,7 +5782,7 @@ function renderProductosTrazabilidad(){
 
 
         const stockClase =
-        stock <= 1000
+        stock <= 1
         ?
         "stock-bajo"
         :
@@ -5792,10 +5792,9 @@ function renderProductosTrazabilidad(){
         const tr =
 document.createElement("tr");
 
-if(stock <= 1000){
-    tr.classList.add("stock-bajo");
+if(stock <= 1){
+    tr.style.backgroundColor = "#ffcccc";
 }
-
 
         tr.innerHTML = `
 
