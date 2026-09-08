@@ -2640,10 +2640,19 @@ this.value
 
 </td>
 
-<td>
+<td class="celda-kg-neto">
+    <span class="kg-neto-valor">
+        ${e.kgNeto}
+    </span>
 
-${e.kgNeto}
-
+    <button
+        type="button"
+        class="btn-control-parcela"
+        onclick="toggleControlParcela(${index})"
+        title="Ver información de la parcela"
+    >
+        ▼
+    </button>
 </td>
 
 <td> 
@@ -2708,11 +2717,259 @@ guardarDatos();
         </td>
         `;
 
-        entTableBody.appendChild(tr);
+       // =====================================================
+// FILA DESPLEGABLE DEL CONTROL DE PARCELA
+// =====================================================
+
+const filaControl =
+    document.createElement("tr");
+
+filaControl.id =
+    "control-parcela-" + index;
+
+filaControl.className =
+    "fila-control-parcela";
+
+filaControl.style.display =
+    "none";
+
+const celdaControl =
+    document.createElement("td");
+
+// Tu tabla de entradas tiene 19 columnas
+celdaControl.colSpan = 19;
+
+
+// -----------------------------------------------------
+// OBTENER DATOS DE LA PARCELA
+// -----------------------------------------------------
+
+const vina =
+    obtenerVinaDeEntrada(index);
+
+
+// -----------------------------------------------------
+// SI ENCONTRAMOS LA PARCELA
+// -----------------------------------------------------
+
+if(vina){
+
+    const hectareas =
+        Number(vina.hectareas) || 0;
+
+    const kgHa =
+        Number(vina.kgHa) || 0;
+
+    const maximo =
+        obtenerMaximoParcela(index);
+
+    const recibidos =
+        obtenerKgNetosParcela(index);
+
+    const restantes =
+        obtenerKgRestantesParcela(index);
+
+    const porcentaje =
+        obtenerPorcentajeDisponibleParcela(index);
+
+
+    celdaControl.innerHTML = `
+
+        <div class="control-parcela">
+
+            <div class="control-parcela-cabecera">
+                CONTROL DE PARCELA
+            </div>
+
+
+            <div class="control-parcela-datos">
+
+                <div class="dato-parcela">
+
+                    <span>
+                        Hectáreas
+                    </span>
+
+                    <strong>
+                        ${
+                            hectareas.toLocaleString(
+                                "es-ES",
+                                {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }
+                            )
+                        } ha
+                    </strong>
+
+                </div>
+
+
+                <div class="dato-parcela">
+
+                    <span>
+                        Rendimiento Máximo
+                    </span>
+
+                    <strong>
+                        ${
+                            kgHa.toLocaleString(
+                                "es-ES"
+                            )
+                        } kg/ha
+                    </strong>
+
+                </div>
+
+
+                <div class="dato-parcela">
+
+                    <span>
+                        Máximo Parcela
+                    </span>
+
+                    <strong>
+                        ${
+                            maximo !== null
+                                ? maximo.toLocaleString(
+                                    "es-ES"
+                                )
+                                : "—"
+                        } kg
+                    </strong>
+
+                </div>
+
+
+                <div class="dato-parcela">
+
+                    <span>
+                        Kg Netos Recibidos
+                    </span>
+
+                    <strong>
+                        ${
+                            recibidos.toLocaleString(
+                                "es-ES"
+                            )
+                        } kg
+                    </strong>
+
+                </div>
+
+
+                <div class="dato-parcela">
+
+                    <span>
+                        Kg Restantes
+                    </span>
+
+                    <strong>
+                        ${
+                            restantes !== null
+                                ? restantes.toLocaleString(
+                                    "es-ES"
+                                )
+                                : "—"
+                        } kg
+                    </strong>
+
+                </div>
+
+
+                <div class="dato-parcela">
+
+                    <span>
+                        Disponible
+                    </span>
+
+                    <strong>
+                        ${
+                            porcentaje !== null
+                                ? porcentaje.toLocaleString(
+                                    "es-ES",
+                                    {
+                                        minimumFractionDigits: 1,
+                                        maximumFractionDigits: 1
+                                    }
+                                )
+                                : "—"
+                        } %
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}else{
+
+    celdaControl.innerHTML = `
+
+        <div class="control-parcela">
+
+            No se ha podido localizar
+            la parcela de esta entrada.
+
+        </div>
+
+    `;
+
+}
+
+
+// -----------------------------------------------------
+// AÑADIR LA CELDA A LA FILA
+// -----------------------------------------------------
+
+filaControl.appendChild(
+    celdaControl
+);
+
+
+// -----------------------------------------------------
+// AÑADIR LA ENTRADA Y SU PANEL
+// -----------------------------------------------------
+
+entTableBody.appendChild(tr);
+
+entTableBody.appendChild(
+    filaControl
+);
 
     });
 
 }
+
+// =====================================================
+// ABRIR / CERRAR PANEL DE CONTROL DE PARCELA
+// =====================================================
+
+window.toggleControlParcela = function(index){
+
+    const panel =
+        document.getElementById(
+            "control-parcela-" + index
+        );
+
+    if(!panel){
+        return;
+    }
+
+    if(panel.style.display === "none"){
+
+        panel.style.display = "table-row";
+
+    }else{
+
+        panel.style.display = "none";
+
+    }
+
+};
 
 window.seleccionarTitular =
 function(index,nombre){
@@ -2812,6 +3069,266 @@ function(index){
     guardarDatos();
 
 };
+
+// =====================================================
+// CONTROL DE PARCELA - FUNCIONES DE CÁLCULO
+// =====================================================
+
+
+// -----------------------------------------------------
+// OBTENER LA VIÑA CORRESPONDIENTE A UNA ENTRADA
+// -----------------------------------------------------
+
+function obtenerVinaDeEntrada(index){
+
+    const entrada = entradas[index];
+
+    if(!entrada){
+        return null;
+    }
+
+    if(!entrada.titular){
+        return null;
+    }
+
+    const titular =
+        obtenerTitulares().find(
+            t =>
+                t.nombre === entrada.titular
+        );
+
+    if(!titular || !titular.vinas){
+        return null;
+    }
+
+    const vina =
+        titular.vinas.find(v => {
+
+            return (
+
+                String(v.municipio) ===
+                String(entrada.municipio)
+
+                &&
+
+                String(v.poligono) ===
+                String(entrada.poligono)
+
+                &&
+
+                String(v.parcela) ===
+                String(entrada.parcela)
+
+                &&
+
+                String(v.recinto) ===
+                String(entrada.recinto)
+
+            );
+
+        });
+
+    return vina || null;
+}
+
+
+// -----------------------------------------------------
+// OBTENER MÁXIMO TOTAL DE LA PARCELA
+// -----------------------------------------------------
+
+function obtenerMaximoParcela(index){
+
+    const vina =
+        obtenerVinaDeEntrada(index);
+
+    if(!vina){
+        return null;
+    }
+
+    // Rendimiento que ya está guardado
+    if(
+        Number.isFinite(
+            Number(vina.rendimiento)
+        )
+        &&
+        Number(vina.rendimiento) > 0
+    ){
+
+        return Number(vina.rendimiento);
+
+    }
+
+    // Por seguridad, si no existe rendimiento,
+    // lo calculamos aquí
+
+    const hectareas =
+        Number(vina.hectareas) || 0;
+
+    const kgHa =
+        Number(vina.kgHa) || 0;
+
+    const calculado =
+        hectareas * kgHa;
+
+    if(calculado > 0){
+        return calculado;
+    }
+
+    return null;
+}
+
+
+// -----------------------------------------------------
+// OBTENER KG NETOS ACUMULADOS DE LA PARCELA
+// -----------------------------------------------------
+//
+// IMPORTANTE:
+// Aquí NO excluimos la entrada actual.
+//
+// El panel debe mostrar el TOTAL de la parcela,
+// independientemente de qué entrada abramos.
+//
+
+function obtenerKgNetosParcela(index){
+
+    const entrada =
+        entradas[index];
+
+    if(!entrada){
+        return 0;
+    }
+
+    let total = 0;
+
+    entradas.forEach(otraEntrada => {
+
+        // Solo campaña actual
+        if(
+            Number(
+                otraEntrada.anio || 2025
+            )
+            !==
+            anioActivo
+        ){
+            return;
+        }
+
+        // Comprobar que pertenece a la misma parcela
+        const mismaParcela = (
+
+            String(
+                otraEntrada.titular || ""
+            ).trim()
+            ===
+            String(
+                entrada.titular || ""
+            ).trim()
+
+            &&
+
+            String(
+                otraEntrada.municipio || ""
+            ).trim()
+            ===
+            String(
+                entrada.municipio || ""
+            ).trim()
+
+            &&
+
+            String(
+                otraEntrada.poligono || ""
+            ).trim()
+            ===
+            String(
+                entrada.poligono || ""
+            ).trim()
+
+            &&
+
+            String(
+                otraEntrada.parcela || ""
+            ).trim()
+            ===
+            String(
+                entrada.parcela || ""
+            ).trim()
+
+            &&
+
+            String(
+                otraEntrada.recinto || ""
+            ).trim()
+            ===
+            String(
+                entrada.recinto || ""
+            ).trim()
+
+        );
+
+        if(!mismaParcela){
+            return;
+        }
+
+        // AQUÍ SOLO SUMAMOS KG NETOS
+        total +=
+            Number(
+                otraEntrada.kgNeto
+            ) || 0;
+
+    });
+
+    return total;
+}
+
+
+// -----------------------------------------------------
+// OBTENER KG RESTANTES DE LA PARCELA
+// -----------------------------------------------------
+
+function obtenerKgRestantesParcela(index){
+
+    const maximo =
+        obtenerMaximoParcela(index);
+
+    if(maximo === null){
+        return null;
+    }
+
+    const recibidos =
+        obtenerKgNetosParcela(index);
+
+    return Math.max(
+        0,
+        maximo - recibidos
+    );
+}
+
+
+// -----------------------------------------------------
+// OBTENER PORCENTAJE DISPONIBLE
+// -----------------------------------------------------
+
+function obtenerPorcentajeDisponibleParcela(index){
+
+    const maximo =
+        obtenerMaximoParcela(index);
+
+    const restantes =
+        obtenerKgRestantesParcela(index);
+
+    if(
+        maximo === null ||
+        restantes === null ||
+        maximo <= 0
+    ){
+        return null;
+    }
+
+    return (
+        restantes / maximo
+    ) * 100;
+}
 
 window.actualizarKgBruto =
 function(index,valor){

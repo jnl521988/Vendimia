@@ -1928,3 +1928,172 @@ table td{
     }
 
 }
+
+/* =====================================================
+   FLECHA CONTROL DE PARCELA
+   ===================================================== */
+
+.celda-kg-neto {
+    white-space: nowrap;
+}
+
+.kg-neto-valor {
+    display: inline-block;
+}
+
+.btn-control-parcela {
+    display: inline-block;
+    margin-left: 5px;
+    padding: 2px 6px;
+
+    border: none;
+    border-radius: 4px;
+
+    background: transparent;
+
+    cursor: pointer;
+
+    font-size: 13px;
+    font-weight: bold;
+
+    line-height: 1;
+}
+
+.btn-control-parcela:hover {
+    background: #e5e5e5;
+}
+
+/* =====================================================
+   PANEL DESPLEGABLE DE PARCELA
+   ===================================================== */
+
+.fila-control-parcela td {
+    padding: 4px 8px 10px 8px;
+    border-top: none;
+}
+
+
+.control-parcela {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 12px;
+
+    border: 1px solid #eb0f0f;
+    border-radius: 8px;
+
+    background: #e7e48d;
+
+    text-align: left;
+}
+
+
+.control-parcela-cabecera {
+    font-size: 13px;
+    font-weight: bold;
+
+    margin-bottom: 10px;
+
+    color: #444;
+}
+
+
+.control-parcela-datos {
+    display: grid;
+
+    grid-template-columns:
+        repeat(6, 1fr);
+
+    gap: 8px;
+}
+
+
+.dato-parcela {
+    background: white;
+
+    border: 1px solid #ddd;
+
+    border-radius: 6px;
+
+    padding: 8px;
+
+    text-align: center;
+}
+
+
+.dato-parcela span {
+    display: block;
+
+    font-size: 11px;
+
+    color: #666;
+
+    margin-bottom: 4px;
+}
+
+
+.dato-parcela strong {
+    display: block;
+
+    font-size: 14px;
+
+    color: #222;
+}
+
+
+/* =====================================================
+   MÓVIL
+   ===================================================== */
+
+@media (max-width: 900px) {
+
+    .control-parcela-datos {
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .control-parcela {
+
+        padding: 8px;
+
+    }
+
+
+    .control-parcela-datos {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+        gap: 5px;
+
+    }
+
+
+    .dato-parcela {
+
+        padding: 6px;
+
+    }
+
+
+    .dato-parcela span {
+
+        font-size: 10px;
+
+    }
+
+
+    .dato-parcela strong {
+
+        font-size: 12px;
+
+    }
+
+}
