@@ -2775,7 +2775,12 @@ if(vina){
 
     celdaControl.innerHTML = `
 
-        <div class="control-parcela">
+        <div class="control-parcela ${
+    maximo !== null &&
+    recibidos >= (maximo * 0.95)
+        ? "control-parcela-alerta"
+        : ""
+}">
 
             <div class="control-parcela-cabecera">
                 CONTROL DE PARCELA
@@ -3282,6 +3287,7 @@ function obtenerKgNetosParcela(index){
 }
 
 
+
 // -----------------------------------------------------
 // OBTENER KG RESTANTES DE LA PARCELA
 // -----------------------------------------------------
@@ -3331,20 +3337,95 @@ function obtenerPorcentajeDisponibleParcela(index){
 }
 
 window.actualizarKgBruto =
-function(index,valor){
+function(index, valor){
 
-    entradas[index].kgBruto =
-    Number(valor);
+    const entrada = entradas[index];
 
-    entradas[index].kgNeto = Math.max(
+    if(!entrada){
+        return;
+    }
 
-        0,
+    // ---------------------------------------------
+    // VALORES ANTERIORES DE LA ENTRADA
+    // ---------------------------------------------
 
-        entradas[index].kgBruto -
+    const netoAnterior =
+        Number(entrada.kgNeto) || 0;
 
-        entradas[index].kgTara
+    const nuevoBruto =
+        Number(valor) || 0;
 
-    );
+    const taraActual =
+        Number(entrada.kgTara) || 0;
+
+    const nuevoNeto =
+        Math.max(
+            0,
+            nuevoBruto - taraActual
+        );
+
+
+    // ---------------------------------------------
+    // COMPROBAR LÍMITE DE LA PARCELA
+    // ---------------------------------------------
+
+    const maximo =
+        obtenerMaximoParcela(index);
+
+    if(maximo !== null){
+
+        const totalParcela =
+            obtenerKgNetosParcela(index);
+
+        // Quitamos del total el neto anterior
+        // de esta misma entrada
+        const totalSinEstaEntrada =
+            totalParcela - netoAnterior;
+
+        const nuevoTotal =
+            totalSinEstaEntrada + nuevoNeto;
+
+
+        if(nuevoTotal > maximo){
+
+            const restantes =
+                Math.max(
+                    0,
+                    maximo - totalSinEstaEntrada
+                );
+
+            alert(
+                "⛔ LÍMITE DE LA PARCELA ALCANZADO\n\n" +
+                "Esta entrada no puede superar los " +
+                maximo.toLocaleString("es-ES") +
+                " kg máximos de la parcela.\n\n" +
+                "Kilos restantes disponibles: " +
+                restantes.toLocaleString("es-ES") +
+                " kg"
+            );
+
+            // Volvemos a mostrar el valor anterior
+            renderEntradas();
+
+            return;
+        }
+    }
+
+
+    // ---------------------------------------------
+    // GUARDAR NUEVO BRUTO Y CALCULAR NETO
+    // ---------------------------------------------
+
+    entrada.kgBruto =
+        nuevoBruto;
+
+    entrada.kgNeto =
+        nuevoNeto;
+
+
+    // ---------------------------------------------
+    // ACTUALIZAR RESTO DEL PROGRAMA
+    // ---------------------------------------------
 
     renderEntradas();
     renderDepositos();
@@ -3356,20 +3437,95 @@ function(index,valor){
 };
 
 window.actualizarKgTara =
-function(index,valor){
+function(index, valor){
 
-    entradas[index].kgTara =
-    Number(valor);
+    const entrada = entradas[index];
 
-    entradas[index].kgNeto = Math.max(
+    if(!entrada){
+        return;
+    }
 
-        0,
+    // ---------------------------------------------
+    // VALORES ANTERIORES DE LA ENTRADA
+    // ---------------------------------------------
 
-        entradas[index].kgBruto -
+    const netoAnterior =
+        Number(entrada.kgNeto) || 0;
 
-        entradas[index].kgTara
+    const brutoActual =
+        Number(entrada.kgBruto) || 0;
 
-    );
+    const nuevaTara =
+        Number(valor) || 0;
+
+    const nuevoNeto =
+        Math.max(
+            0,
+            brutoActual - nuevaTara
+        );
+
+
+    // ---------------------------------------------
+    // COMPROBAR LÍMITE DE LA PARCELA
+    // ---------------------------------------------
+
+    const maximo =
+        obtenerMaximoParcela(index);
+
+    if(maximo !== null){
+
+        const totalParcela =
+            obtenerKgNetosParcela(index);
+
+        // Quitamos del total el neto anterior
+        // de esta misma entrada
+        const totalSinEstaEntrada =
+            totalParcela - netoAnterior;
+
+        const nuevoTotal =
+            totalSinEstaEntrada + nuevoNeto;
+
+
+        if(nuevoTotal > maximo){
+
+            const restantes =
+                Math.max(
+                    0,
+                    maximo - totalSinEstaEntrada
+                );
+
+            alert(
+                "⛔ LÍMITE DE LA PARCELA ALCANZADO\n\n" +
+                "Esta entrada no puede superar los " +
+                maximo.toLocaleString("es-ES") +
+                " kg máximos de la parcela.\n\n" +
+                "Kilos restantes disponibles: " +
+                restantes.toLocaleString("es-ES") +
+                " kg"
+            );
+
+            // Volvemos a mostrar el valor anterior
+            renderEntradas();
+
+            return;
+        }
+    }
+
+
+    // ---------------------------------------------
+    // GUARDAR NUEVA TARA Y CALCULAR NETO
+    // ---------------------------------------------
+
+    entrada.kgTara =
+        nuevaTara;
+
+    entrada.kgNeto =
+        nuevoNeto;
+
+
+    // ---------------------------------------------
+    // ACTUALIZAR RESTO DEL PROGRAMA
+    // ---------------------------------------------
 
     renderEntradas();
     renderDepositos();
@@ -4701,42 +4857,103 @@ document
 .getElementById("exportJsonBtn")
 .addEventListener("click", exportarJSON);
 
+
 function exportarJSON(){
 
     const datos = {
 
+        // =========================================
+        // VITICULTORES
+        // =========================================
+
         viticultores,
+
+        // =========================================
+        // ENTRADAS DE UVA
+        // =========================================
+
         entradas,
+
+        // =========================================
+        // DEPÓSITOS
+        // =========================================
+
         datosDeposito,
+
+        // =========================================
+        // LÍAS
+        // =========================================
+
         lias,
+
+        // =========================================
+        // HOLLEJOS
+        // =========================================
+
         hollejos,
+
+        // =========================================
+        // TRAZABILIDAD DE DEPÓSITOS
+        // =========================================
+
+        trazabilidad,
+
+        // =========================================
+        // PRODUCTOS TRAZABILIDAD
+        // =========================================
+
+        productosTrazabilidad,
+
+        // =========================================
+        // AÑO ACTIVO
+        // =========================================
+
         anioActivo
 
     };
 
-    const contenido =
-    JSON.stringify(datos, null, 2);
 
-    const blob = new Blob(
-        [contenido],
-        { type:"application/json" }
+    const contenido =
+    JSON.stringify(
+        datos,
+        null,
+        2
     );
+
+
+    const blob =
+    new Blob(
+        [contenido],
+        {
+            type:"application/json"
+        }
+    );
+
 
     const url =
     URL.createObjectURL(blob);
 
+
     const enlace =
     document.createElement("a");
 
-    const fecha =
-    new Date().toISOString().slice(0,10);
 
-    enlace.href = url;
+    const fecha =
+    new Date()
+    .toISOString()
+    .slice(0,10);
+
+
+    enlace.href =
+    url;
+
 
     enlace.download =
     `Vendimia_${fecha}.json`;
 
+
     enlace.click();
+
 
     URL.revokeObjectURL(url);
 
@@ -4761,67 +4978,170 @@ function importarJSON(event){
     const archivo =
     event.target.files[0];
 
-    if(!archivo) return;
 
-    const lector = new FileReader();
+    if(!archivo)
+        return;
 
-    lector.onload = function(e){
+
+    const lector =
+    new FileReader();
+
+
+    lector.onload =
+    function(e){
 
         try{
 
             const datos =
-            JSON.parse(e.target.result);
+            JSON.parse(
+                e.target.result
+            );
+
 
             if(
                 !confirm(
                     "Se sustituirán todos los datos actuales. ¿Continuar?"
                 )
             ){
+
+                event.target.value = "";
+
                 return;
+
             }
+
+
+            // =========================================
+            // VITICULTORES
+            // =========================================
 
             viticultores =
             datos.viticultores || [];
 
+
+            // =========================================
+            // ENTRADAS DE UVA
+            // =========================================
+
             entradas =
             datos.entradas || [];
+
+
+            // =========================================
+            // DEPÓSITOS
+            // =========================================
 
             datosDeposito =
             datos.datosDeposito || {};
 
+
+            // =========================================
+            // LÍAS
+            // =========================================
+
             lias =
             datos.lias || [];
 
+
+            // =========================================
+            // HOLLEJOS
+            // =========================================
+
             hollejos =
             datos.hollejos || [];
+
+
+            // =========================================
+            // TRAZABILIDAD DE DEPÓSITOS
+            // =========================================
+
+            trazabilidad =
+            datos.trazabilidad || [];
+
+
+            // =========================================
+            // PRODUCTOS TRAZABILIDAD
+            // =========================================
+
+            productosTrazabilidad =
+            datos.productosTrazabilidad || [];
+
+
+            // =========================================
+            // REINICIAR DEPÓSITO ACTIVO
+            // =========================================
+
+            depositoTrazabilidadActivo =
+            null;
+
+
+            // =========================================
+            // AÑO ACTIVO
+            // =========================================
 
             anioActivo =
             datos.anioActivo ||
             new Date().getFullYear();
 
+
+            // =========================================
+            // GUARDAR
+            // =========================================
+
             guardarDatos();
+
 
             localStorage.setItem(
                 "anioActivo",
                 anioActivo
             );
 
+
+            // =========================================
+            // ACTUALIZAR AÑO EN PANTALLA
+            // =========================================
+
             document
             .getElementById("anioActual")
-            .textContent = anioActivo;
+            .textContent =
+            anioActivo;
+
+
+            // =========================================
+            // REDIBUJAR TODAS LAS PÁGINAS
+            // =========================================
 
             renderViticultores();
+
             renderEntradas();
+
             renderDepositos();
+
             renderTotalesLitros();
+
             renderLias();
+
             renderHollejos();
+
+            renderTrazabilidad();
+
+
+            // =========================================
+            // AVISO
+            // =========================================
 
             alert(
                 "Datos importados correctamente"
             );
 
+
         }catch(error){
+
+            console.error(
+                "Error importando JSON:",
+                error
+            );
+
 
             alert(
                 "El archivo JSON no es válido"
@@ -4829,9 +5149,15 @@ function importarJSON(event){
 
         }
 
+
+        // =========================================
+        // PERMITIR VOLVER A IMPORTAR EL MISMO ARCHIVO
+        // =========================================
+
         event.target.value = "";
 
     };
+
 
     lector.readAsText(archivo);
 

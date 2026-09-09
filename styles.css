@@ -2097,3 +2097,21 @@ table td{
     }
 
 }
+
+/* =====================================================
+   ALERTA CONTROL DE PARCELA
+   ===================================================== */
+
+.control-parcela-alerta {
+    background: #ffd6d6 !important;
+    border: 2px solid #d60000 !important;
+}
+
+.control-parcela-alerta .control-parcela-cabecera {
+    background: #d60000 !important;
+    color: white !important;
+}
+
+.control-parcela-alerta strong {
+    color: #b00000;
+}
