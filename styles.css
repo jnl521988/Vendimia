@@ -2116,47 +2116,20 @@ table td{
     color: #b00000;
 }
 
-.control-parcela-alerta strong {
-    color: #b00000;
+/* =========================================
+   DESPLAZAMIENTO HORIZONTAL DEPÓSITOS
+   SOLO EN LA TABLA
+========================================= */
+
+.depositos-scroll{
+    width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
 }
 
-/* =====================================================
-   SCROLL HORIZONTAL EN TABLAS ESPECÍFICAS - MÓVIL
-   ===================================================== */
-
-@media (max-width: 768px){
-
-    /* -------------------------------------------------
-       DEPÓSITOS DESCUBADOS
-       ------------------------------------------------- */
-
-    #page-depositos-descubados{
-        width:100%;
-        overflow-x:auto;
-        -webkit-overflow-scrolling:touch;
-    }
-
-    #page-depositos-descubados table{
-        width:max-content;
-        min-width:100%;
-        white-space:nowrap;
-    }
-
-
-    /* -------------------------------------------------
-       TABLAS DE TOTALES
-       ------------------------------------------------- */
-
-    #page-totales .totales-card{
-        width:100%;
-        overflow-x:auto;
-        -webkit-overflow-scrolling:touch;
-    }
-
-    #page-totales .totales-card table{
-        width:max-content;
-        min-width:100%;
-        white-space:nowrap;
-    }
-
+#depositosTable{
+    width:max-content;
+    min-width:100%;
+    white-space:nowrap;
 }
