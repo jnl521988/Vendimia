@@ -2165,3 +2165,9 @@ table td{
     }
 
 }
+
+/* Ensanchar Fecha de encubado en trazabilidad */
+.trazabilidad-tabla-wrapper th:first-child,
+.trazabilidad-tabla-wrapper td:first-child{
+    min-width:140px;
+}
