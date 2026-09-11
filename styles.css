@@ -2116,20 +2116,25 @@ table td{
     color: #b00000;
 }
 
-/* =========================================
-   DESPLAZAMIENTO HORIZONTAL DEPÓSITOS
-   SOLO EN LA TABLA
-========================================= */
+/* SCROLL SOLO TABLA DEPÓSITOS EN MÓVIL */
 
-.depositos-scroll{
-    width:100%;
-    overflow-x:auto;
-    overflow-y:hidden;
-    -webkit-overflow-scrolling:touch;
-}
+@media (max-width: 768px){
 
-#depositosTable{
-    width:max-content;
-    min-width:100%;
-    white-space:nowrap;
+    .depositos-table-scroll{
+        display:block;
+        width:100%;
+        max-width:100%;
+        overflow-x:auto !important;
+        overflow-y:hidden;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    #depositosTable{
+        display:table !important;
+        width:max-content !important;
+        min-width:1100px !important;
+        max-width:none !important;
+        white-space:nowrap !important;
+    }
+
 }
