@@ -2138,3 +2138,30 @@ table td{
     }
 
 }
+
+/* =========================================
+   SCROLL TABLAS DE TOTALES EN MÓVIL
+========================================= */
+
+@media (max-width: 768px){
+
+    .totales-table-scroll{
+        display:block;
+        width:100%;
+        max-width:100%;
+        overflow-x:auto !important;
+        overflow-y:hidden;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    #tablaTotalesLitros,
+    #liasTable,
+    #hollejosTable{
+        display:table !important;
+        width:max-content !important;
+        min-width:700px !important;
+        max-width:none !important;
+        white-space:nowrap !important;
+    }
+
+}
