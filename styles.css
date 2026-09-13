@@ -2166,16 +2166,22 @@ table td{
 
 }
 
-/* FECHA DE ENCUBADO - TRAZABILIDAD */
+@media (max-width:768px){
 
-.trazabilidad-datos{
-    grid-template-columns:
-        minmax(130px, 1fr)
-        1fr
-        2fr
-        1.2fr;
-}
+    .trazabilidad-datos{
+        grid-template-columns:
+            130px
+            1fr
+            2fr
+            1.2fr;
+    }
 
-.trazabilidad-dato:first-child{
-    min-width:130px;
+    .trazabilidad-dato{
+        min-width:0;
+    }
+
+    .trazabilidad-dato:first-child{
+        min-width:130px;
+    }
+
 }
