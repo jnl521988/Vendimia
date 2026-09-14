@@ -2169,19 +2169,17 @@ table td{
 @media (max-width:768px){
 
     .trazabilidad-datos{
-        grid-template-columns:
-            130px
-            1fr
-            2fr
-            1.2fr;
+        display:grid;
+        grid-template-columns:repeat(4, 1fr);
+        gap:6px;
+        width:100%;
     }
 
     .trazabilidad-dato{
         min-width:0;
-    }
-
-    .trazabilidad-dato:first-child{
-        min-width:130px;
+        width:100%;
+        box-sizing:border-box;
+        padding:8px 6px;
     }
 
 }
