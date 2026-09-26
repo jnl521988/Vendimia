@@ -4543,8 +4543,8 @@ Object.entries(datosDeposito)
 
     if(!datos.descubado) return;
 
-    const [deposito,vuelta] =
-    clave.split("-");
+    const [anio, deposito, vuelta] = 
+clave.split("-");
 
     entradas.forEach(e=>{
 
