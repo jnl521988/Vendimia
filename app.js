@@ -1093,39 +1093,34 @@ function exportarViticultorPDF(indice) {
         return;
     }
 
-   // =====================================
-// TOTALES
+// =====================================
+// TOTALES - EXPORTAR PDF
 // =====================================
 
 if(pagina.id === "page-totales"){
 
-    const doc =
-    new jsPDF("portrait");
+    const doc = new jsPDF("portrait");
 
     const tablas = [
 
         {
             titulo:"RESUMEN DE UVAS",
-            id:"tablaTotalesUva",
-            manual:false
+            id:"tablaTotalesUva"
         },
 
         {
             titulo:"RESUMEN DE LITROS",
-            id:"tablaTotalesLitros",
-            manual:false
+            id:"tablaTotalesLitros"
         },
 
         {
             titulo:"LÍAS DEL VINO",
-            id:"liasTable",
-            manual:true
+            id:"liasTable"
         },
 
         {
             titulo:"HOLLEJOS PRENSADOS",
-            id:"hollejosTable",
-            manual:true
+            id:"hollejosTable"
         }
 
     ];
@@ -1133,14 +1128,18 @@ if(pagina.id === "page-totales"){
 
     tablas.forEach((tabla,index)=>{
 
-        if(index>0){
-
+        if(index > 0){
             doc.addPage();
-
         }
 
 
+        // =====================================
+        // TÍTULO
+        // =====================================
+
         doc.setFontSize(16);
+
+        doc.setFont(undefined,"bold");
 
         doc.text(
             `${tabla.titulo} - CAMPAÑA ${anioActivo}`,
@@ -1148,10 +1147,15 @@ if(pagina.id === "page-totales"){
             15
         );
 
+        doc.setFont(undefined,"normal");
+
 
         // =====================================
-        // KG UVA DESCUBADOS ENCIMA DE LA TABLA
+        // KG UVA DESCUBADOS
         // =====================================
+
+        let posicionTabla = 25;
+
 
         if(tabla.id === "tablaTotalesLitros"){
 
@@ -1159,6 +1163,7 @@ if(pagina.id === "page-totales"){
                 document.getElementById(
                     "kgUvaDescubadosLitros"
                 )?.textContent || "0 kg";
+
 
             doc.setFontSize(11);
             doc.setFont(undefined,"bold");
@@ -1170,6 +1175,8 @@ if(pagina.id === "page-totales"){
             );
 
             doc.setFont(undefined,"normal");
+
+            posicionTabla = 29;
 
         }
 
@@ -1181,6 +1188,7 @@ if(pagina.id === "page-totales"){
                     "kgUvaDescubadosHollejos"
                 )?.textContent || "0 kg";
 
+
             doc.setFontSize(11);
             doc.setFont(undefined,"bold");
 
@@ -1192,364 +1200,464 @@ if(pagina.id === "page-totales"){
 
             doc.setFont(undefined,"normal");
 
-        }
-
-
-        // =====================================
-        // TABLAS AUTOMÁTICAS
-        // =====================================
-
-        if(!tabla.manual){
-
-            doc.autoTable({
-
-                html:`#${tabla.id}`,
-
-                startY:
-                    tabla.id === "tablaTotalesLitros"
-                    ? 29
-                    : 25,
-
-                theme:"grid",
-
-                headStyles:{
-                    fillColor:[210,140,135]
-                },
-
-                footStyles:{
-                    fillColor:[210,140,135]
-                },
-
-                styles:{
-                    fontSize:9
-                }
-
-            });
+            posicionTabla = 29;
 
         }
 
 
+        const tablaDOM =
+            document.getElementById(tabla.id);
+
+        if(!tablaDOM) return;
+
+
         // =====================================
-        // TABLAS MANUALES
+        // CABECERA
         // =====================================
 
-        else{
+        const cabecera = [];
 
-            const tablaDOM =
-                document.getElementById(tabla.id);
+        tablaDOM
+        .querySelectorAll("thead th")
+        .forEach(th=>{
 
-            const cabecera = [];
+            if(
+                th.textContent.trim() !== "Acciones"
+            ){
 
+                cabecera.push(
+                    th.textContent.trim()
+                );
 
-            tablaDOM.querySelectorAll("thead th")
-            .forEach(th=>{
-
-                if(
-                    th.textContent.trim() !== "Acciones"
-                ){
-
-                    cabecera.push(
-                        th.textContent.trim()
-                    );
-
-                }
-
-            });
-
-
-            const filas = [];
-
-
-            tablaDOM.querySelectorAll("tbody tr")
-            .forEach(tr=>{
-
-    // ==========================================
-    // FILA DE NOTA
-    // ==========================================
-
-    if(tr.classList.contains("fila-nota")){
-
-        const textoNota =
-        tr.textContent.trim();
-
-        filas.push([
-            {
-                content: textoNota,
-                colSpan: cabecera.length,
-                styles: {
-                    fontStyle: "italic",
-                    halign: "left"
-                }
             }
-        ]);
 
-        return;
-    }
+        });
 
 
-                const fila = [];
+        // =====================================
+        // CUERPO
+        // =====================================
+
+        const filas = [];
+
+        let filaTotalPDF = null;
+        let filaNotaPDF = null;
 
 
-                tr.querySelectorAll("td")
-                .forEach(td=>{
-
-                    if(td.querySelector("button"))
-                        return;
+        tablaDOM
+        .querySelectorAll("tbody tr")
+        .forEach(tr=>{
 
 
-                    const input =
-                        td.querySelector("input");
+            // =================================
+            // FILA NOTA
+            // =================================
 
+            if(
+                tr.classList.contains("fila-nota")
+            ){
 
-                    if(input){
+                const textoNota =
+                    tr.textContent.trim();
 
-                        let valor =
-                            input.value;
+                filaNotaPDF = {
 
+                    content: textoNota,
 
-                        // =====================================
-                        // FECHA
-                        // =====================================
+                    colSpan: cabecera.length,
 
-                        if(
-                            input.type === "date" &&
-                            valor
-                        ){
+                    styles:{
 
-                            const partes =
-                                valor.split("-");
+                        fillColor:[255,245,180],
 
-                            if(partes.length === 3){
+                        textColor:[0,0,0],
 
-                                valor =
-                                    `${partes[2]}/${partes[1]}/${partes[0]}`;
+                        fontStyle:"italic",
 
-                            }
-
-                        }
-
-
-                        fila.push(valor);
-
-                    }else{
-
-                        fila.push(
-                            td.textContent.trim()
-                        );
+                        halign:"left"
 
                     }
 
-                });
+                };
+
+                return;
+
+            }
 
 
-                filas.push(fila);
+            // =================================
+            // FILA TOTAL
+            // =================================
 
-            });
+            if(
+                tr.classList.contains("fila-total")
+            ){
 
+                const fila = [];
 
-            // =====================================
-            // PIE DE TABLA
-            // =====================================
+                tr.querySelectorAll("td, th")
+                .forEach(celda=>{
 
-            const pie = [];
+                    const texto =
+                        celda.textContent.trim();
 
-
-            if(tabla.id === "liasTable"){
-
-                /*
-                 * En LÍAS el HTML tiene una fila TOTAL
-                 * con columnas combinadas.
-                 *
-                 * La construimos manualmente para que
-                 * cada dato quede en su columna.
-                 */
-
-                const filaTotal =
-                    tablaDOM.querySelector(
-                        "tfoot tr"
-                    );
+                    const colspan =
+                        parseInt(
+                            celda.getAttribute("colspan")
+                        ) || 1;
 
 
-                if(filaTotal){
+                    fila.push({
 
-                    const celdas =
-                        filaTotal.querySelectorAll(
-                            "th, td"
-                        );
+                        content: texto,
 
+                        colSpan: colspan,
 
-                    let totalLitros = "0";
-                    let porcentaje = "0 %";
+                        styles:{
 
+                            fillColor:[210,140,135],
 
-                    celdas.forEach((celda)=>{
+                            textColor:[0,0,0],
 
-                        const texto =
-                            celda.textContent.trim();
+                            fontStyle:"bold",
 
-
-                        if(
-                            texto &&
-                            texto !== "TOTAL"
-                        ){
-
-                            if(
-                                texto.includes("%")
-                            ){
-
-                                porcentaje =
-                                    texto;
-
-                            }else{
-
-                                totalLitros =
-                                    texto;
-
-                            }
+                            halign:"center"
 
                         }
 
                     });
 
+                });
 
-                    pie.push([
 
-                        "TOTAL",
+                filaTotalPDF = fila;
 
-                        "",
+                return;
 
-                        totalLitros,
+            }
 
-                        porcentaje
 
-                    ]);
+            // =================================
+            // FILAS NORMALES
+            // =================================
+
+            const fila = [];
+
+            tr.querySelectorAll("td")
+            .forEach(td=>{
+
+                if(td.querySelector("button")){
+                    return;
+                }
+
+
+                const input =
+                    td.querySelector("input");
+
+
+                if(input){
+
+                    let valor =
+                        input.value;
+
+
+                    // -------------------------
+                    // FECHA
+                    // -------------------------
+
+                    if(
+                        input.type === "date" &&
+                        valor
+                    ){
+
+                        const partes =
+                            valor.split("-");
+
+
+                        if(partes.length === 3){
+
+                            valor =
+                                `${partes[2]}/${partes[1]}/${partes[0]}`;
+
+                        }
+
+                    }
+
+
+                    fila.push(valor);
+
+                }else{
+
+                    fila.push(
+                        td.textContent.trim()
+                    );
 
                 }
 
-            }else{
-
-                const filaPie = [];
+            });
 
 
-                tablaDOM.querySelectorAll(
-                    "tfoot th"
-                )
-                .forEach(th=>{
+            if(fila.length){
+                filas.push(fila);
+            }
 
-                    if(
-                        th.textContent.trim()
-                    ){
+        });
 
-                        filaPie.push(
-                            th.textContent.trim()
-                        );
+
+        // =====================================
+        // TOTAL DEL TFOOT
+        // =====================================
+
+        const filaTotalTfoot =
+            tablaDOM.querySelector(
+                "tfoot tr"
+            );
+
+
+        if(
+            !filaTotalPDF &&
+            filaTotalTfoot
+        ){
+
+            const fila = [];
+
+
+            filaTotalTfoot
+            .querySelectorAll("th, td")
+            .forEach(celda=>{
+
+                const texto =
+                    celda.textContent.trim();
+
+                const colspan =
+                    parseInt(
+                        celda.getAttribute("colspan")
+                    ) || 1;
+
+
+                fila.push({
+
+                    content: texto,
+
+                    colSpan: colspan,
+
+                    styles:{
+
+                        fillColor:[210,140,135],
+
+                        textColor:[0,0,0],
+
+                        fontStyle:"bold",
+
+                        halign:
+                            texto === "TOTAL"
+                            ? "left"
+                            : "center"
 
                     }
 
                 });
 
+            });
 
-                if(filaPie.length){
 
-                    pie.push(filaPie);
+            filaTotalPDF = fila;
+
+        }
+
+
+        // =====================================
+        // PIE DE TABLA
+        // =====================================
+
+        const pie = [];
+
+
+        // PRIMERO TOTAL
+        // DESPUÉS NOTA
+
+        if(filaTotalPDF){
+
+            pie.push(
+                filaTotalPDF
+            );
+
+        }
+
+
+        if(filaNotaPDF){
+
+            pie.push([
+                filaNotaPDF
+            ]);
+
+        }
+
+
+        // =====================================
+        // ANCHOS DE COLUMNAS
+        // =====================================
+
+        let columnStyles = {};
+
+
+        if(tabla.id === "liasTable"){
+
+            columnStyles = {
+
+                0:{
+                    cellWidth:30
+                },
+
+                1:{
+                    cellWidth:72
+                },
+
+                2:{
+                    cellWidth:42
+                },
+
+                3:{
+                    cellWidth:28
+                }
+
+            };
+
+        }
+
+
+        if(tabla.id === "hollejosTable"){
+
+            columnStyles = {
+
+                0:{
+                    cellWidth:32
+                },
+
+                1:{
+                    cellWidth:70
+                },
+
+                2:{
+                    cellWidth:38
+                },
+
+                3:{
+                    cellWidth:30
+                }
+
+            };
+
+        }
+
+
+        // =====================================
+        // EXPORTAR TABLA
+        // =====================================
+
+        doc.autoTable({
+
+            startY:posicionTabla,
+
+            head:[cabecera],
+
+            body:filas,
+
+            foot:pie,
+
+            theme:"grid",
+
+            headStyles:{
+
+                fillColor:[210,140,135],
+
+                textColor:[0,0,0],
+
+                fontStyle:"bold"
+
+            },
+
+            footStyles:{
+
+                fillColor:[210,140,135],
+
+                textColor:[0,0,0],
+
+                fontStyle:"bold"
+
+            },
+
+            styles:{
+
+                fontSize:9,
+
+                cellPadding:3
+
+            },
+
+            columnStyles:columnStyles,
+
+
+            // =================================
+            // COLORES ESPECIALES
+            // =================================
+
+            didParseCell:function(data){
+
+                // -----------------------------
+                // FILA TOTAL
+                // -----------------------------
+
+                if(
+                    data.section === "foot" &&
+                    data.row.index === 0
+                ){
+
+                    data.cell.styles.fillColor =
+                        [210,140,135];
+
+                    data.cell.styles.textColor =
+                        [0,0,0];
+
+                    data.cell.styles.fontStyle =
+                        "bold";
+
+                }
+
+
+                // -----------------------------
+                // FILA NOTA
+                // -----------------------------
+
+                if(
+                    data.section === "foot" &&
+                    data.row.index === 1
+                ){
+
+                    data.cell.styles.fillColor =
+                        [255,245,180];
+
+                    data.cell.styles.textColor =
+                        [0,0,0];
+
+                    data.cell.styles.fontStyle =
+                        "italic";
+
+                    data.cell.styles.halign =
+                        "left";
 
                 }
 
             }
 
-
-            // =====================================
-            // ANCHOS DE COLUMNAS
-            // =====================================
-
-            let columnStyles = {};
-
-
-            if(tabla.id === "liasTable"){
-
-                columnStyles = {
-
-                    0:{
-                        cellWidth:30
-                    },
-
-                    1:{
-                        cellWidth:72
-                    },
-
-                    2:{
-                        cellWidth:42
-                    },
-
-                    3:{
-                        cellWidth:28
-                    }
-
-                };
-
-            }
-
-
-            if(tabla.id === "hollejosTable"){
-
-                columnStyles = {
-
-                    0:{
-                        cellWidth:32
-                    },
-
-                    1:{
-                        cellWidth:70
-                    },
-
-                    2:{
-                        cellWidth:38
-                    },
-
-                    3:{
-                        cellWidth:30
-                    }
-
-                };
-
-            }
-
-
-            doc.autoTable({
-
-                startY:
-                    tabla.id === "hollejosTable"
-                    ? 29
-                    : 25,
-
-                head:[cabecera],
-
-                body:filas,
-
-                foot:pie,
-
-                theme:"grid",
-
-                headStyles:{
-                    fillColor:[210,140,135]
-                },
-
-                footStyles:{
-                    fillColor:[210,140,135]
-                },
-
-                styles:{
-                    fontSize:9
-                },
-
-                columnStyles:columnStyles
-
-            });
-
-        }
+        });
 
     });
 
+
+    // =====================================
+    // GUARDAR PDF
+    // =====================================
 
     doc.save(
         `Totales_${anioActivo}.pdf`
@@ -4788,8 +4896,15 @@ document.getElementById(
 porcentajeTotalLias.toFixed(2)
 + " %";
 
-const notaRow = document.createElement("tr");
-notaRow.className = "fila-nota";
+// =======================================
+// NOTA DE LÍAS
+// =======================================
+
+const notaRow =
+    document.createElement("tr");
+
+notaRow.className =
+    "fila-nota";
 
 notaRow.innerHTML = `
     <td colspan="5">
@@ -4797,7 +4912,14 @@ notaRow.innerHTML = `
     </td>
 `;
 
-liasTableBody.appendChild(notaRow);
+const tfoot =
+    document.querySelector("#liasTable tfoot");
+
+if(tfoot){
+
+    tfoot.appendChild(notaRow);
+
+}
 
 }
 
@@ -4973,8 +5095,15 @@ document.getElementById(
 porcentajeTotalHollejos.toFixed(2)
 + " %";
 
-const notaRow = document.createElement("tr");
-notaRow.className = "fila-nota";
+// =======================================
+// NOTA DE HOLLEJOS
+// =======================================
+
+const notaRow =
+    document.createElement("tr");
+
+notaRow.className =
+    "fila-nota";
 
 notaRow.innerHTML = `
     <td colspan="5">
@@ -4982,7 +5111,15 @@ notaRow.innerHTML = `
     </td>
 `;
 
-hollejosTableBody.appendChild(notaRow);
+// La nota se coloca DESPUÉS de la fila TOTAL
+const tfoot =
+    document.querySelector("#hollejosTable tfoot");
+
+if(tfoot){
+
+    tfoot.appendChild(notaRow);
+
+}
 
 document.getElementById(
     "kgUvaDescubadosHollejos"

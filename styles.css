@@ -646,10 +646,15 @@ table td{
 
 }
 
+.fila-nota {
+    background: #fff5b4 !important;
+    color: #000 !important;
+    font-style: italic;
+}
+
 .fila-nota td {
-    background: #dde078;
-    font-size: 12px;
-    color: #0e0e0e;
+    background: #fff5b4 !important;
+    color: #000 !important;
 }
 
 .modal-overlay{
