@@ -657,6 +657,24 @@ table td{
     color: #000 !important;
 }
 
+/* =========================================================
+   NOTAS DE LAS TABLAS DE TOTALES
+   ========================================================= */
+
+#tablaTotalesLitros tbody tr.fila-nota {
+    background-color: #fff3cd !important;
+    color: #000 !important;
+    font-weight: bold !important;
+    font-style: italic !important;
+}
+
+#tablaTotalesLitros tbody tr.fila-nota td {
+    background-color: #fff3cd !important;
+    color: #000 !important;
+    font-weight: bold !important;
+    font-style: italic !important;
+}
+
 .modal-overlay{
     display:none;
     position:fixed;

@@ -1119,7 +1119,7 @@ if(pagina.id === "page-totales"){
         },
 
         {
-            titulo:"HOLLEJOS PRENSADOS",
+            titulo:"ORUJOS PRENSADOS",
             id:"hollejosTable"
         }
 
@@ -1250,39 +1250,36 @@ if(pagina.id === "page-totales"){
 
 
             // =================================
-            // FILA NOTA
-            // =================================
+// FILA NOTA
+// =================================
 
-            if(
-                tr.classList.contains("fila-nota")
-            ){
+if(
+    tr.classList.contains("fila-nota")
+){
 
-                const textoNota =
-                    tr.textContent.trim();
+    const textoNota =
+        tr.textContent.trim();
 
-                filaNotaPDF = {
+    filaNotaPDF = {
 
-                    content: textoNota,
+        content: textoNota,
 
-                    colSpan: cabecera.length,
+        colSpan: cabecera.length,
 
-                    styles:{
+        styles:{
 
-                        fillColor:[255,245,180],
+            fillColor:[255,245,180],
+            textColor:[0,0,0],
+            fontStyle:"bolditalic",
+            halign:"left"
 
-                        textColor:[0,0,0],
+        }
 
-                        fontStyle:"italic",
+    };
 
-                        halign:"left"
+    return;
 
-                    }
-
-                };
-
-                return;
-
-            }
+}
 
 
             // =================================
@@ -1466,32 +1463,91 @@ if(pagina.id === "page-totales"){
         }
 
 
-        // =====================================
-        // PIE DE TABLA
-        // =====================================
+      // =====================================
+// PIE DE TABLA
+// =====================================
 
-        const pie = [];
+const pie = [];
+
+// =====================================
+// PRIMERO: FILA TOTAL
+// =====================================
+
+if(filaTotalPDF){
+
+    pie.push(
+        filaTotalPDF
+    );
+
+}
 
 
-        // PRIMERO TOTAL
-        // DESPUÉS NOTA
+// =====================================
+// SEGUNDO: NOTA
+// =====================================
 
-        if(filaTotalPDF){
+// LÍAS
+if(tabla.id === "liasTable"){
 
-            pie.push(
-                filaTotalPDF
-            );
+    pie.push([
 
+        {
+            content:
+                "NOTA: LOS LITROS DE LÍAS ES LO QUE VA SALIENDO DE LOS DEPÓSITOS Y EL PORCENTAJE ES CON RESPECTO A LOS KGS DE UVA TOTALES EN LAS ENTRADAS",
+
+            colSpan:cabecera.length,
+
+            styles:{
+                fillColor:[255,245,180],
+                textColor:[0,0,0],
+                fontStyle:"bolditalic",
+                halign:"left"
+            }
         }
 
+    ]);
 
-        if(filaNotaPDF){
+}
 
-            pie.push([
-                filaNotaPDF
-            ]);
 
+// HOLLEJOS
+if(tabla.id === "hollejosTable"){
+
+    pie.push([
+
+        {
+            content:
+                "NOTA: LOS KGS DE HOLLEJOS ES LO QUE VA SALIENDO DE LAS PRENSAS Y EL PORCENTAJE ES CON RESPECTO A LOS KGS DE UVA DESCUBADOS",
+
+            colSpan:cabecera.length,
+
+            styles:{
+                fillColor:[255,245,180],
+                textColor:[0,0,0],
+                fontStyle:"bolditalic",
+                halign:"left"
+            }
         }
+
+    ]);
+
+}
+
+
+// =====================================
+// NOTA DEL RESUMEN DE LITROS
+// =====================================
+
+if(
+    tabla.id === "tablaTotalesLitros" &&
+    filaNotaPDF
+){
+
+    pie.push([
+        filaNotaPDF
+    ]);
+
+}
 
 
         // =====================================
@@ -4752,6 +4808,17 @@ function renderLias(){
 
     liasTableBody.innerHTML = "";
 
+    // Eliminar cualquier nota anterior para evitar duplicados
+const tfootLias = document.querySelector("#liasTable tfoot");
+
+if(tfootLias){
+
+    tfootLias
+        .querySelectorAll(".fila-nota")
+        .forEach(nota => nota.remove());
+
+}
+
     let totalLitrosLias = 0;
 
     let kgTotalesUva = 0;
@@ -4933,6 +5000,17 @@ function renderHollejos(){
     if(!hollejosTableBody) return;
 
     hollejosTableBody.innerHTML = "";
+
+    // Eliminar cualquier nota anterior para evitar duplicados
+const tfootHollejos = document.querySelector("#hollejosTable tfoot");
+
+if(tfootHollejos){
+
+    tfootHollejos
+        .querySelectorAll(".fila-nota")
+        .forEach(nota => nota.remove());
+
+}
 
     let totalKg = 0;
 
